@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KSI-AI — Study Smarter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f7f7f5;--surface:#fff;--border:#e5e5e0;--border2:#cdcdc7;
+  --text:#18181b;--muted:#6b7280;--muted2:#9ca3af;
+  --accent:#0ea5e9;--accent-dark:#0284c7;--accent-bg:#f0f9ff;--accent-border:#bae6fd;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-b:#bbf7d0;
+  --red:#dc2626;--red-bg:#fef2f2;--red-b:#fecaca;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-b:#fde68a;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-b:#ddd6fe;
+  --r:10px;--font:'Outfit',sans-serif;--serif:'Instrument Serif',serif;
+}
+[data-theme="dark"]{
+  --bg:#0f0f12;--surface:#18181f;--border:#27272f;--border2:#37373f;
+  --text:#f0f0f5;--muted:#8888a0;--muted2:#55556a;
+  --accent:#38bdf8;--accent-dark:#0ea5e9;--accent-bg:#0a1929;--accent-border:#1e3a5f;
+  --green:#4ade80;--green-bg:#071a07;--green-b:#14532d;
+  --red:#f87171;--red-bg:#1c0707;--red-b:#7f1d1d;
+  --amber:#fbbf24;--amber-bg:#1a1000;--amber-b:#78350f;
+  --purple:#a78bfa;--purple-bg:#13091f;--purple-b:#4c1d95;
+}
+html{font-size:15px;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s;}
+#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:1rem;transition:opacity .5s;}
+#splash.hide{opacity:0;pointer-events:none;}
+.splash-logo{font-family:var(--serif);font-size:2.2rem;font-weight:600;display:flex;align-items:center;gap:12px;}
+.splash-icon{width:48px;height:48px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.3rem;}
+.dots{display:flex;gap:7px;}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:bounce 1.2s infinite;}
+.dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,80%,100%{transform:scale(.5);opacity:.4;}40%{transform:scale(1);opacity:1;}}
+#authWrap{min-height:100vh;display:none;align-items:center;justify-content:center;padding:1.5rem;}
+#authWrap.show{display:flex;}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:440px;padding:2.5rem;box-shadow:0 8px 60px rgba(0,0,0,.08);}
+.auth-logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:2rem;}
+.auth-logo-icon{width:42px;height:42px;background:var(--accent);border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.15rem;}
+.auth-logo-name{font-family:var(--serif);font-size:1.6rem;font-weight:600;}
+.auth-tabs{display:flex;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:1.5rem;}
+.auth-tab{flex:1;padding:.5rem;border-radius:8px;border:none;background:none;font-family:var(--font);font-size:.88rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;}
+.auth-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.field{margin-bottom:.9rem;}
+.field label{display:block;font-size:.79rem;font-weight:600;color:var(--muted);margin-bottom:.35rem;}
+.field input{width:100%;padding:.7rem .9rem;border:1px solid var(--border2);border-radius:8px;font-size:.92rem;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;transition:border-color .15s;}
+.field input:focus{border-color:var(--accent);}
+.btn-auth{width:100%;padding:.75rem;border:none;border-radius:9px;cursor:pointer;font-size:.95rem;font-weight:600;font-family:var(--font);background:var(--accent);color:#fff;transition:background .15s;margin-top:.4rem;}
+.btn-auth:hover{background:var(--accent-dark);}
+.btn-auth:disabled{opacity:.5;cursor:not-allowed;}
+.btn-google{width:100%;padding:.72rem;border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:.9rem;font-weight:500;font-family:var(--font);background:var(--surface);color:var(--text);display:flex;align-items:center;justify-content:center;gap:.6rem;transition:all .15s;margin-top:.6rem;}
+.btn-google:hover{border-color:var(--accent);background:var(--accent-bg);}
+.auth-divider{display:flex;align-items:center;gap:.75rem;margin:.9rem 0;color:var(--muted);font-size:.8rem;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-err{background:var(--red-bg);border:1px solid var(--red-b);border-radius:8px;padding:.55rem .9rem;font-size:.81rem;color:var(--red);margin-bottom:.75rem;display:none;}
+.auth-err.show{display:block;}
+.auth-ok{background:var(--green-bg);border:1px solid var(--green-b);border-radius:8px;padding:.55rem .9rem;font-size:.81rem;color:var(--green);margin-bottom:.75rem;display:none;}
+.auth-ok.show{display:block;}
+.auth-switch{text-align:center;margin-top:1rem;font-size:.83rem;color:var(--muted);}
+.auth-switch a{color:var(--accent);cursor:pointer;font-weight:500;}
+#appWrap{display:none;min-height:100vh;flex-direction:column;}
+#appWrap.show{display:flex;}
+header{position:sticky;top:0;z-index:50;background:rgba(247,247,245,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:.65rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;transition:background .3s,border-color .3s;}
+[data-theme="dark"] header{background:rgba(15,15,18,.94);}
+.logo{display:flex;align-items:center;gap:9px;}
+.logo-icon{width:33px;height:33px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.92rem;}
+.logo-name{font-family:var(--serif);font-size:1.25rem;font-weight:600;}
+.hdr-r{display:flex;align-items:center;gap:.6rem;}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;transition:all .15s;}
+.icon-btn:hover{background:var(--bg);}
+.user-pill{display:flex;align-items:center;gap:.5rem;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:.3rem .9rem .3rem .4rem;font-size:.82rem;cursor:pointer;transition:border-color .15s;}
+.user-pill:hover{border-color:var(--accent);}
+.uavatar{width:27px;height:27px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;overflow:hidden;flex-shrink:0;}
+.uavatar img{width:100%;height:100%;object-fit:cover;}
+.btn-out{padding:.4rem .9rem;border:1px solid var(--border2);border-radius:8px;background:none;cursor:pointer;font-size:.82rem;font-family:var(--font);color:var(--muted);transition:all .15s;}
+.btn-out:hover{background:var(--red-bg);color:var(--red);border-color:var(--red-b);}
+.body-wrap{display:flex;flex:1;min-height:0;}
+aside{width:225px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:1.25rem .75rem;display:flex;flex-direction:column;gap:.12rem;overflow-y:auto;transition:background .3s;}
+.nav-label{font-size:.67rem;font-weight:700;color:var(--muted2);letter-spacing:.11em;text-transform:uppercase;padding:.65rem .65rem .28rem;margin-top:.4rem;}
+.nav-btn{display:flex;align-items:center;gap:.6rem;padding:.55rem .78rem;border-radius:8px;cursor:pointer;font-size:.87rem;color:var(--muted);transition:background .12s,color .12s;border:none;background:none;width:100%;text-align:left;font-family:var(--font);}
+.nav-btn:hover{background:var(--bg);color:var(--text);}
+.nav-btn.active{background:var(--accent-bg);color:var(--accent);font-weight:600;}
+.nav-icon{font-size:.9rem;width:20px;text-align:center;flex-shrink:0;}
+main{flex:1;overflow-y:auto;padding:2.25rem 2.75rem;}
+.page{display:none;animation:fadeUp .22s ease;}
+.page.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(9px);}to{opacity:1;transform:translateY(0);}}
+.page-title{font-family:var(--serif);font-size:1.85rem;font-weight:600;margin-bottom:.3rem;}
+.page-sub{color:var(--muted);font-size:.88rem;margin-bottom:2rem;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem;transition:background .3s,border-color .3s;}
+.card+.card{margin-top:1rem;}
+.card-label{font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.5rem;display:block;}
+textarea{width:100%;min-height:140px;resize:vertical;padding:.8rem 1rem;border:1px solid var(--border);border-radius:8px;font-size:.9rem;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;line-height:1.65;transition:border-color .15s,background .3s;}
+textarea:focus{border-color:var(--accent);}
+textarea::placeholder{color:var(--muted2);}
+.txt-input{width:100%;padding:.7rem .9rem;border:1px solid var(--border);border-radius:8px;font-size:.9rem;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;transition:border-color .15s;}
+.txt-input:focus{border-color:var(--accent);}
+.txt-input::placeholder{color:var(--muted2);}
+.row{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;flex-wrap:wrap;gap:.75rem;}
+select{padding:.45rem .75rem;border:1px solid var(--border2);border-radius:8px;font-family:var(--font);font-size:.84rem;background:var(--surface);color:var(--text);outline:none;cursor:pointer;}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.2rem;border-radius:8px;border:none;cursor:pointer;font-size:.88rem;font-weight:600;font-family:var(--font);transition:all .15s;}
+.btn-p{background:var(--accent);color:#fff;}.btn-p:hover{background:var(--accent-dark);}.btn-p:disabled{opacity:.5;cursor:not-allowed;}
+.btn-g{background:none;border:1px solid var(--border2);color:var(--muted);}.btn-g:hover{background:var(--bg);color:var(--text);}
+.btn-sm{padding:.35rem .85rem;font-size:.79rem;}
+.spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none;}
+.spin.on{display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.prog-wrap{display:none;margin-top:.75rem;}
+.prog-wrap.show{display:block;}
+.prog-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s;width:0%;}
+.prog-lbl{font-size:.77rem;color:var(--muted);margin-top:.35rem;}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--r);padding:2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:var(--accent-bg);}
+.upload-zone.done{border-color:var(--green);background:var(--green-bg);border-style:solid;}
+.upload-icon{font-size:2rem;margin-bottom:.5rem;}
+.upload-title{font-weight:600;font-size:.92rem;margin-bottom:.25rem;}
+.upload-sub{font-size:.8rem;color:var(--muted);}
+.rec-btn{display:inline-flex;align-items:center;gap:.6rem;padding:.7rem 1.5rem;border-radius:100px;border:none;cursor:pointer;font-size:.9rem;font-weight:600;font-family:var(--font);transition:all .2s;}
+.rec-btn.idle{background:var(--red);color:#fff;}.rec-btn.idle:hover{background:#b91c1c;}
+.rec-btn.on{background:var(--red-bg);color:var(--red);border:2px solid var(--red);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.3);}50%{box-shadow:0 0 0 10px rgba(220,38,38,0);}}
+.rec-dot{width:10px;height:10px;border-radius:50%;background:currentColor;}
+.rec-time{font-family:monospace;font-size:.9rem;color:var(--red);font-weight:600;}
+.output{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem 1.75rem;display:none;margin-top:1rem;}
+.output.show{display:block;}
+.output h1,.output h2,.output h3{font-family:var(--serif);font-weight:600;margin:1rem 0 .4rem;line-height:1.25;}
+.output h1{font-size:1.3rem;}.output h2{font-size:1.1rem;}.output h3{font-size:1rem;}
+.output p{margin-bottom:.65rem;line-height:1.7;font-size:.91rem;}
+.output ul,.output ol{padding-left:1.4rem;margin-bottom:.65rem;}
+.output li{margin-bottom:.25rem;font-size:.91rem;line-height:1.6;}
+.output strong{font-weight:600;}
+.out-actions{display:flex;gap:.5rem;margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--border);flex-wrap:wrap;}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:1rem;}
+.fc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;perspective:1000px;min-height:165px;transition:box-shadow .15s;}
+.fc:hover{box-shadow:0 4px 20px rgba(14,165,233,.12);}
+.fc-inner{position:relative;width:100%;min-height:165px;transition:transform .42s;transform-style:preserve-3d;}
+.fc.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-front,.fc-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--r);padding:1.2rem;display:flex;flex-direction:column;justify-content:space-between;}
+.fc-front{background:var(--surface);}.fc-back{background:var(--accent-bg);transform:rotateY(180deg);}
+.fc-tag{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.fc-front .fc-tag{color:var(--muted);}.fc-back .fc-tag{color:var(--accent);}
+.fc-text{font-size:.88rem;line-height:1.55;color:var(--text);margin-top:.45rem;flex:1;}
+.fc-hint{font-size:.72rem;color:var(--muted);text-align:right;}
+.score-bar{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:var(--r);padding:1.2rem 1.5rem;display:none;margin-bottom:1.25rem;align-items:center;gap:1rem;}
+.score-bar.show{display:flex;}
+.score-num{font-family:var(--serif);font-size:2.4rem;font-weight:600;color:var(--accent);line-height:1;}
+.quiz-q{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.35rem;margin-bottom:.85rem;}
+.q-num{font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.45rem;}
+.q-text{font-size:.94rem;font-weight:500;margin-bottom:.9rem;line-height:1.5;}
+.opts{display:flex;flex-direction:column;gap:.4rem;}
+.opt{padding:.6rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:.86rem;font-family:var(--font);color:var(--text);text-align:left;display:flex;gap:.7rem;align-items:flex-start;transition:all .12s;}
+.opt:hover:not([disabled]){border-color:var(--accent);background:var(--accent-bg);}
+.opt.correct{border-color:var(--green);background:var(--green-bg);color:var(--green);}
+.opt.wrong{border-color:var(--red);background:var(--red-bg);color:var(--red);}
+.opt-l{font-weight:700;flex-shrink:0;width:16px;}
+.explain{font-size:.81rem;color:var(--muted);margin-top:.65rem;padding:.6rem .85rem;background:var(--bg);border-radius:6px;line-height:1.55;display:none;}
+.explain.show{display:block;}
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;}
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.35rem;cursor:pointer;transition:border-color .15s,box-shadow .15s;}
+.dash-card:hover{border-color:var(--accent);box-shadow:0 2px 16px rgba(14,165,233,.1);}
+.dc-icon{font-size:1.5rem;margin-bottom:.65rem;}
+.dc-title{font-weight:600;font-size:.93rem;margin-bottom:.2rem;}
+.dc-desc{font-size:.8rem;color:var(--muted);line-height:1.5;}
+.section-hd{font-family:var(--serif);font-size:1.1rem;font-weight:600;margin-bottom:.75rem;}
+.h-list{display:flex;flex-direction:column;gap:.5rem;}
+.h-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.7rem 1rem;display:flex;align-items:center;gap:.75rem;}
+.h-icon{font-size:.88rem;width:32px;height:32px;background:var(--bg);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.h-title{font-size:.85rem;font-weight:500;}
+.h-meta{font-size:.75rem;color:var(--muted);}
+.h-empty{text-align:center;padding:2.5rem;color:var(--muted);font-size:.85rem;}
+.saved-list{display:flex;flex-direction:column;gap:.65rem;}
+.s-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.2rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;}
+.s-title{font-size:.9rem;font-weight:500;margin-bottom:.2rem;}
+.s-preview{font-size:.8rem;color:var(--muted);line-height:1.5;}
+.s-meta{font-size:.74rem;color:var(--muted);margin-top:.35rem;}
+.btn-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:.8rem;padding:.25rem .5rem;border-radius:6px;transition:all .15s;font-family:var(--font);}
+.btn-del:hover{background:var(--red-bg);color:var(--red);}
+.prof-avatar{width:82px;height:82px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.9rem;font-weight:700;overflow:hidden;margin-bottom:1rem;}
+.prof-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--bg);border-radius:8px;padding:.85rem 1rem;text-align:center;}
+.stat-num{font-family:var(--serif);font-size:1.7rem;font-weight:600;color:var(--accent);}
+.stat-lbl{font-size:.77rem;color:var(--muted);margin-top:.2rem;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;border-bottom:0.5px solid var(--border);}
+.toggle-row:last-child{border-bottom:none;}
+.tgl-lbl{font-size:.9rem;font-weight:500;}
+.tgl-sub{font-size:.77rem;color:var(--muted);}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.tgl-slider{position:absolute;inset:0;background:var(--border2);border-radius:12px;cursor:pointer;transition:background .2s;}
+.tgl-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;}
+.toggle input:checked+.tgl-slider{background:var(--accent);}
+.toggle input:checked+.tgl-slider::before{transform:translateX(20px);}
+.info{border-radius:8px;padding:.65rem .9rem;font-size:.81rem;margin-bottom:.85rem;line-height:1.5;}
+.info-blue{background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent-dark);}
+.info-amber{background:var(--amber-bg);border:1px solid var(--amber-b);color:var(--amber);}
+.info-purple{background:var(--purple-bg);border:1px solid var(--purple-b);color:var(--purple);}
+.info-green{background:var(--green-bg);border:1px solid var(--green-b);color:var(--green);}
+.sheets-dot{width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block;margin-right:5px;transition:background .3s;}
+.sheets-dot.ok{background:var(--green);}
+.sheets-dot.err{background:var(--red);}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:#18181b;color:#fff;padding:.65rem 1.15rem;border-radius:9px;font-size:.83rem;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;max-width:320px;line-height:1.4;}
+.toast.show{opacity:1;transform:translateY(0);}
+[data-theme="dark"] .toast{background:#e8e8ef;color:#18181b;}
+@media(max-width:820px){aside{display:none;}main{padding:1.25rem 1rem;}.dash-grid{grid-template-columns:1fr 1fr;}.fc-grid{grid-template-columns:1fr;}}
+@media(max-width:520px){.dash-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div id="splash">
+  <div class="splash-logo"><div class="splash-icon">K</div>KSI-AI</div>
+  <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+<div id="authWrap">
+  <div class="auth-card">
+    <div class="auth-logo"><div class="auth-logo-icon">K</div><div class="auth-logo-name">KSI-AI</div></div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+    <div id="loginForm">
+      <div class="auth-err" id="loginErr"></div>
+      <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••"/></div>
+      <button class="btn-auth" id="loginBtn" onclick="doLogin()">Sign In</button>
+      <div class="auth-divider">or</div>
+      <button class="btn-google" onclick="doGoogle()"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</button>
+      <div class="auth-switch"><a onclick="showReset()">Forgot password?</a></div>
+    </div>
+    <div id="signupForm" style="display:none;">
+      <div class="auth-err" id="signupErr"></div>
+      <div class="auth-ok" id="signupOk"></div>
+      <div class="field"><label>Full Name</label><input type="text" id="signupName" placeholder="Your full name"/></div>
+      <div class="field"><label>Email</label><input type="email" id="signupEmail" placeholder="you@example.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="signupPass" placeholder="At least 6 characters"/></div>
+      <button class="btn-auth" id="signupBtn" onclick="doSignup()">Create Account — Free</button>
+      <div class="auth-divider">or</div>
+      <button class="btn-google" onclick="doGoogle()"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</button>
+    </div>
+    <div id="resetForm" style="display:none;">
+      <div class="auth-err" id="resetErr"></div>
+      <div class="auth-ok" id="resetOk"></div>
+      <div class="field"><label>Email</label><input type="email" id="resetEmail" placeholder="you@example.com"/></div>
+      <button class="btn-auth" onclick="doReset()">Send Reset Email</button>
+      <div class="auth-switch"><a onclick="switchTab('login')">← Back to sign in</a></div>
+    </div>
+  </div>
+</div>
+<div id="appWrap">
+  <header>
+    <div class="logo"><div class="logo-icon">K</div><div class="logo-name">KSI-AI</div></div>
+    <div class="hdr-r">
+      <span style="font-size:.75rem;color:var(--muted);display:flex;align-items:center;"><span class="sheets-dot" id="sheetsDot"></span><span id="sheetsStatus">Sheets</span></span>
+      <button class="icon-btn" id="darkToggle" onclick="toggleDark()" title="Dark mode">🌙</button>
+      <div class="user-pill" onclick="nav('profile',qs('[data-page=profile]'))">
+        <div class="uavatar" id="uAvatar">?</div>
+        <span id="uName" style="font-size:.84rem;font-weight:500;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      </div>
+      <button class="btn-out" onclick="doLogout()">Sign out</button>
+    </div>
+  </header>
+  <div class="body-wrap">
+    <aside>
+      <div class="nav-label">Menu</div>
+      <button class="nav-btn active" data-page="dashboard" onclick="nav('dashboard',this)"><span class="nav-icon">🏠</span>Dashboard</button>
+      <div class="nav-label">Study Tools</div>
+      <button class="nav-btn" data-page="notes" onclick="nav('notes',this)"><span class="nav-icon">📝</span>Smart Notes</button>
+      <button class="nav-btn" data-page="pdf" onclick="nav('pdf',this)"><span class="nav-icon">📄</span>PDF Upload</button>
+      <button class="nav-btn" data-page="youtube" onclick="nav('youtube',this)"><span class="nav-icon">▶️</span>YouTube Notes</button>
+      <button class="nav-btn" data-page="lecture" onclick="nav('lecture',this)"><span class="nav-icon">🎙️</span>Lecture Recorder</button>
+      <button class="nav-btn" data-page="flashcards" onclick="nav('flashcards',this)"><span class="nav-icon">🃏</span>Flashcards</button>
+      <button class="nav-btn" data-page="quiz" onclick="nav('quiz',this)"><span class="nav-icon">🎯</span>Practice Quiz</button>
+      <button class="nav-btn" data-page="summary" onclick="nav('summary',this)"><span class="nav-icon">⚡</span>Summarize</button>
+      <div class="nav-label">Library</div>
+      <button class="nav-btn" data-page="saved" onclick="nav('saved',this)"><span class="nav-icon">💾</span>Saved Notes</button>
+      <div class="nav-label">Account</div>
+      <button class="nav-btn" data-page="profile" onclick="nav('profile',this)"><span class="nav-icon">👤</span>Profile & Settings</button>
+    </aside>
+    <main>
+      <div class="page active" id="page-dashboard">
+        <div class="page-title" id="dashGreet">Welcome!</div>
+        <div class="page-sub">What would you like to study today?</div>
+        <div class="dash-grid">
+          <div class="dash-card" onclick="nav('notes',qs('[data-page=notes]'))"><div class="dc-icon">📝</div><div class="dc-title">Smart Notes</div><div class="dc-desc">Paste anything — get instant structured notes.</div></div>
+          <div class="dash-card" onclick="nav('pdf',qs('[data-page=pdf]'))"><div class="dc-icon">📄</div><div class="dc-title">PDF Upload</div><div class="dc-desc">Upload up to 500 pages — auto-generate notes.</div></div>
+          <div class="dash-card" onclick="nav('youtube',qs('[data-page=youtube]'))"><div class="dc-icon">▶️</div><div class="dc-title">YouTube Notes</div><div class="dc-desc">Paste a YouTube link → get instant notes.</div></div>
+          <div class="dash-card" onclick="nav('lecture',qs('[data-page=lecture]'))"><div class="dc-icon">🎙️</div><div class="dc-title">Lecture Recorder</div><div class="dc-desc">Record live — AI transcribes and notes.</div></div>
+          <div class="dash-card" onclick="nav('flashcards',qs('[data-page=flashcards]'))"><div class="dc-icon">🃏</div><div class="dc-title">Flashcards</div><div class="dc-desc">Flip cards generated from your content.</div></div>
+          <div class="dash-card" onclick="nav('quiz',qs('[data-page=quiz]'))"><div class="dc-icon">🎯</div><div class="dc-title">Practice Quiz</div><div class="dc-desc">Test yourself with AI-generated questions.</div></div>
+        </div>
+        <div class="section-hd">Recent Activity</div>
+        <div class="h-list" id="histList"><div class="h-empty">No activity yet — pick a tool above!</div></div>
+      </div>
+      <div class="page" id="page-notes">
+        <div class="page-title">Smart Notes</div>
+        <div class="page-sub">Paste any content and get clean, structured notes instantly.</div>
+        <div class="card">
+          <label class="card-label">Your content</label>
+          <textarea id="notesIn" placeholder="Paste lecture notes, textbook chapters, articles, anything…"></textarea>
+          <div class="row">
+            <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+              <select id="notesStyle"><option value="concise">Concise summary</option><option value="detailed">Detailed notes</option><option value="bullets">Bullet points</option><option value="cornell">Cornell style</option><option value="mindmap">Mind map outline</option></select>
+              <label style="display:flex;align-items:center;gap:.4rem;font-size:.81rem;color:var(--muted);cursor:pointer;"><input type="checkbox" id="saveChk" style="width:14px;height:14px;accent-color:var(--accent);"/> Save to library</label>
+            </div>
+            <button class="btn btn-p" id="notesBtn" onclick="genNotes()"><span class="spin" id="notesSpin"></span>Generate Notes</button>
+          </div>
+        </div>
+        <div class="output" id="notesOut"><div id="notesContent"></div>
+          <div class="out-actions">
+            <button class="btn btn-g btn-sm" onclick="copyEl('notesContent')">📋 Copy</button>
+            <button class="btn btn-g btn-sm" onclick="exportPDF('notesContent','KSI-AI Notes')">📥 Export PDF</button>
+            <button class="btn btn-g btn-sm" onclick="clearOut('notesOut','notesIn')">✕ Clear</button>
+          </div>
+        </div>
+      </div>
+      <div class="page" id="page-pdf">
+        <div class="page-title">PDF Upload</div>
+        <div class="page-sub">Upload any PDF up to 500 pages — textbooks, papers, slides.</div>
+        <div class="card">
+          <div class="info info-blue">📄 Processes up to 500 pages automatically in chunks. Large textbooks fully supported.</div>
+          <div class="upload-zone" id="uploadZone" onclick="$('pdfFile').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+            <div class="upload-icon" id="upIcon">📄</div>
+            <div class="upload-title" id="upTitle">Click to upload or drag & drop your PDF</div>
+            <div class="upload-sub" id="upSub">Supports PDF files up to 500 pages</div>
+          </div>
+          <input type="file" id="pdfFile" accept=".pdf" style="display:none" onchange="handlePdf(this.files[0])"/>
+          <div class="prog-wrap" id="pdfProg"><div class="prog-bar"><div class="prog-fill" id="pdfFill"></div></div><div class="prog-lbl" id="pdfLbl">Reading…</div></div>
+          <div class="row">
+            <select id="pdfStyle"><option value="detailed">Detailed notes</option><option value="concise">Concise summary</option><option value="bullets">Bullet points</option><option value="cornell">Cornell style</option></select>
+            <button class="btn btn-p" id="pdfBtn" onclick="genPdf()" disabled><span class="spin" id="pdfSpin"></span>Generate from PDF</button>
+          </div>
+        </div>
+        <div class="output" id="pdfOut"><div id="pdfContent"></div>
+          <div class="out-actions">
+            <button class="btn btn-g btn-sm" onclick="copyEl('pdfContent')">📋 Copy</button>
+            <button class="btn btn-g btn-sm" onclick="exportPDF('pdfContent','KSI-AI PDF Notes')">📥 Export PDF</button>
+            <button class="btn btn-g btn-sm" onclick="clearPdf()">✕ Clear</button>
+          </div>
+        </div>
+      </div>
+      <div class="page" id="page-youtube">
+        <div class="page-title">YouTube Notes</div>
+        <div class="page-sub">Paste any YouTube URL and get instant study notes.</div>
+        <div class="card">
+          <div class="info info-purple">▶️ Works with any public YouTube video that has captions enabled — lectures, tutorials, documentaries.</div>
+          <label class="card-label">YouTube URL</label>
+          <input class="txt-input" type="url" id="ytUrl" placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."/>
+          <div id="ytPreview" style="display:none;margin-top:.75rem;">
+            <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
+              <img id="ytThumb" src="" style="width:80px;height:52px;object-fit:cover;border-radius:6px;flex-shrink:0;"/>
+              <div><div id="ytTitle" style="font-size:.87rem;font-weight:500;margin-bottom:.3rem;"></div><span style="background:#ff0000;color:#fff;padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:600;">▶ YouTube</span></div>
+            </div>
+          </div>
+          <div class="row">
+            <div style="display:flex;gap:.5rem;">
+              <select id="ytStyle"><option value="detailed">Detailed notes</option><option value="concise">Concise summary</option><option value="bullets">Bullet points</option><option value="cornell">Cornell style</option></select>
+              <button class="btn btn-g btn-sm" onclick="previewYt()">Preview</button>
+            </div>
+            <button class="btn btn-p" id="ytBtn" onclick="genYt()"><span class="spin" id="ytSpin"></span>Generate from YouTube</button>
+          </div>
+        </div>
+        <div class="output" id="ytOut"><div id="ytContent"></div>
+          <div class="out-actions">
+            <button class="btn btn-g btn-sm" onclick="copyEl('ytContent')">📋 Copy</button>
+            <button class="btn btn-g btn-sm" onclick="exportPDF('ytContent','KSI-AI YouTube Notes')">📥 Export PDF</button>
+            <button class="btn btn-g btn-sm" onclick="clearOut('ytOut','ytUrl');$('ytPreview').style.display='none'">✕ Clear</button>
+          </div>
+        </div>
+      </div>
+      <div class="page" id="page-lecture">
+        <div class="page-title">Lecture Recorder</div>
+        <div class="page-sub">Record live — KSI-AI transcribes and builds notes automatically.</div>
+        <div class="card" style="text-align:center;padding:2rem;">
+          <div class="info info-amber" style="text-align:left;">🎙️ Click Record and speak your lecture. Your browser will ask for microphone permission — click Allow.</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1.5rem 0;flex-wrap:wrap;">
+            <button class="rec-btn idle" id="recBtn" onclick="toggleRec()"><span class="rec-dot"></span><span id="recLbl">Start Recording</span></button>
+            <span class="rec-time" id="recTime" style="display:none;">00:00</span>
+          </div>
+          <div id="transcriptArea" style="display:none;text-align:left;margin-top:1rem;">
+            <label class="card-label">Transcript (editable)</label>
+            <textarea id="transcriptTxt" style="min-height:115px;" placeholder="Your speech will appear here…"></textarea>
+            <div class="row">
+              <select id="lectStyle"><option value="detailed">Detailed notes</option><option value="bullets">Bullet points</option><option value="cornell">Cornell style</option><option value="concise">Concise summary</option></select>
+              <button class="btn btn-p" id="lectBtn" onclick="genLecture()"><span class="spin" id="lectSpin"></span>Generate Notes</button>
+            </div>
+          </div>
+        </div>
+        <div class="output" id="lectOut"><div id="lectContent"></div>
+          <div class="out-actions">
+            <button class="btn btn-g btn-sm" onclick="copyEl('lectContent')">📋 Copy</button>
+            <button class="btn btn-g btn-sm" onclick="exportPDF('lectContent','KSI-AI Lecture Notes')">📥 Export PDF</button>
+            <button class="btn btn-g btn-sm" onclick="clearLect()">✕ Clear</button>
+          </div>
+        </div>
+      </div>
+      <div class="page" id="page-flashcards">
+        <div class="page-title">Flashcards</div>
+        <div class="page-sub">Click any card to flip and reveal the answer.</div>
+        <div class="card">
+          <label class="card-label">Your content</label>
+          <textarea id="fcIn" placeholder="Paste your text here…"></textarea>
+          <div class="row">
+            <select id="fcNum"><option value="6">6 cards</option><option value="10" selected>10 cards</option><option value="15">15 cards</option><option value="20">20 cards</option></select>
+            <button class="btn btn-p" id="fcBtn" onclick="genFc()"><span class="spin" id="fcSpin"></span>Generate Cards</button>
+          </div>
+        </div>
+        <div id="fcSection" style="display:none;margin-top:1rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;">
+            <span style="font-size:.82rem;color:var(--muted);" id="fcLbl"></span>
+            <button class="btn btn-g btn-sm" onclick="clearFc()">✕ Clear</button>
+          </div>
+          <div class="fc-grid" id="fcGrid"></div>
+        </div>
+      </div>
+      <div class="page" id="page-quiz">
+        <div class="page-title">Practice Quiz</div>
+        <div class="page-sub">Answer all questions then submit to see your score.</div>
+        <div class="card">
+          <label class="card-label">Your content</label>
+          <textarea id="quizIn" placeholder="Paste your text here…"></textarea>
+          <div class="row">
+            <select id="quizNum"><option value="5">5 questions</option><option value="8" selected>8 questions</option><option value="12">12 questions</option><option value="15">15 questions</option></select>
+            <button class="btn btn-p" id="quizBtn" onclick="genQuiz()"><span class="spin" id="quizSpin"></span>Generate Quiz</button>
+          </div>
+        </div>
+        <div id="quizSection" style="display:none;margin-top:1rem;">
+          <div class="score-bar" id="scoreBar">
+            <div class="score-num" id="scoreNum">0/0</div>
+            <div><div style="font-weight:600;">Quiz complete!</div><div style="color:var(--muted);font-size:.84rem;" id="scoreTxt"></div></div>
+            <button class="btn btn-g btn-sm" style="margin-left:auto;" onclick="retryQuiz()">↺ Retry</button>
+          </div>
+          <div id="quizQs"></div>
+          <div style="display:flex;gap:.5rem;margin-top:.5rem;">
+            <button class="btn btn-p" id="submitBtn" onclick="submitQuiz()" style="display:none;">Submit Quiz</button>
+            <button class="btn btn-g btn-sm" onclick="clearQuiz()">✕ Clear</button>
+          </div>
+        </div>
+      </div>
+      <div class="page" id="page-summary">
+        <div class="page-title">Quick Summary</div>
+        <div class="page-sub">Get a fast TL;DR of any text.</div>
+        <div class="card">
+          <label class="card-label">Your content</label>
+          <textarea id="sumIn" placeholder="Paste any text here…" style="min-height:160px;"></textarea>
+          <div class="row">
+            <select id="sumLen"><option value="short">Short (3–4 sentences)</option><option value="medium" selected>Medium (1 paragraph)</option><option value="long">Detailed key points</option></select>
+            <button class="btn btn-p" id="sumBtn" onclick="genSum()"><span class="spin" id="sumSpin"></span>Summarize</button>
+          </div>
+        </div>
+        <div class="output" id="sumOut"><div id="sumContent"></div>
+          <div class="out-actions">
+            <button class="btn btn-g btn-sm" onclick="copyEl('sumContent')">📋 Copy</button>
+            <button class="btn btn-g btn-sm" onclick="exportPDF('sumContent','KSI-AI Summary')">📥 Export PDF</button>
+            <button class="btn btn-g btn-sm" onclick="clearOut('sumOut','sumIn')">✕ Clear</button>
+          </div>
+        </div>
+      </div>
+      <div class="page" id="page-saved">
+        <div class="page-title">Saved Notes</div>
+        <div class="page-sub">All your notes — saved to your Google Sheet.</div>
+        <div class="saved-list" id="savedList"><div class="h-empty">Loading…</div></div>
+      </div>
+      <div class="page" id="page-profile">
+        <div class="page-title">Profile & Settings</div>
+        <div class="page-sub">Manage your account and preferences.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+          <div class="card">
+            <div style="display:flex;flex-direction:column;align-items:center;padding-bottom:1rem;border-bottom:1px solid var(--border);margin-bottom:1rem;">
+              <div class="prof-avatar" id="profAvatar">?</div>
+              <div style="font-weight:600;font-size:1rem;" id="profName">—</div>
+              <div style="font-size:.82rem;color:var(--muted);" id="profEmail">—</div>
+            </div>
+            <div class="stats-row">
+              <div class="stat-card"><div class="stat-num" id="stNotes">0</div><div class="stat-lbl">Notes</div></div>
+              <div class="stat-card"><div class="stat-num" id="stQuiz">0</div><div class="stat-lbl">Quizzes</div></div>
+              <div class="stat-card"><div class="stat-num" id="stCards">0</div><div class="stat-lbl">Cards</div></div>
+            </div>
+            <div class="field" style="margin-bottom:.75rem;"><label>Display Name</label><input type="text" id="editName" placeholder="Your name" style="width:100%;padding:.65rem .9rem;border:1px solid var(--border2);border-radius:8px;font-size:.9rem;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;"/></div>
+            <button class="btn btn-p btn-sm" onclick="saveProfile()" style="width:100%;">Save Changes</button>
+          </div>
+          <div>
+            <div class="card">
+              <div style="font-weight:600;margin-bottom:1rem;">Preferences</div>
+              <div class="toggle-row">
+                <div><div class="tgl-lbl">Dark Mode</div><div class="tgl-sub">Switch to dark theme</div></div>
+                <label class="toggle"><input type="checkbox" id="darkChk" onchange="toggleDark()"/><span class="tgl-slider"></span></label>
+              </div>
+              <div class="toggle-row">
+                <div><div class="tgl-lbl">Auto-save Notes</div><div class="tgl-sub">Save all generated notes automatically</div></div>
+                <label class="toggle"><input type="checkbox" id="autoSaveChk" onchange="savePrefs()"/><span class="tgl-slider"></span></label>
+              </div>
+            </div>
+            <div class="card" style="margin-top:1rem;">
+              <div style="font-weight:600;margin-bottom:.75rem;">Google Sheets Database</div>
+              <div class="info info-green" style="font-size:.8rem;margin-bottom:.5rem;">✓ Connected — your data saves to your own Google Sheet.</div>
+              <div style="font-size:.78rem;color:var(--muted);">Sheet: 1tNzVsNQ20H5wpj-cvuRxMzV9I2...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║  ONLY ONE THING LEFT TO DO:                             ║
+// ║  Replace the value below with your fresh Groq API key  ║
+// ║  Get it free at: console.groq.com/keys                 ║
+// ╚══════════════════════════════════════════════════════════╝
+const GROQ_KEY = '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';
+
+// ✅ Already filled in — Sheet ID
+const SHEET_ID = '1tNzVsNQ20H5wpj-cvuRxMzV9I2yuMvqGVAZ3rrnhyJc';
+
+// ✅ Already filled in — Apps Script URL
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztoi_hD0_tA8f5-oli4l9-p-5VsDuaKYY9hTAcau8YBLtaZs4k_Mldy3bWbTRD-_j2EQ/exec';
+
+// ✅ Already filled in — Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBhODUaW1lFM6p4vsIoIGmfrBb10XlDndE",
+  authDomain: "ksi-ai.firebaseapp.com",
+  projectId: "ksi-ai",
+  storageBucket: "ksi-ai.firebasestorage.app",
+  messagingSenderId: "776615501119",
+  appId: "1:776615501119:web:1e943b7e61849f6bea878a"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const auth  = getAuth(fbApp);
+const gProv = new GoogleAuthProvider();
+const GROQ_URL   = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+
+let CU=null, quizData=[], quizDone=false, pdfText='';
+let mediaRec=null, recInterval=null, recSecs=0, recognition=null, transcript='';
+
+const $  = id => document.getElementById(id);
+const qs = s  => document.querySelector(s);
+window.qs=qs; window.$=$;
+
+function toast(m,d=2800){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function setLoad(b,s,on){$(b).disabled=on;$(s).classList.toggle('on',on);}
+function timeAgo(ts){if(!ts)return '';const s=Math.floor((Date.now()-new Date(ts).getTime())/1000);if(s<60)return 'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+function mdToHtml(md){return md.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/`(.+?)`/g,'<code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:.86em;font-family:monospace;">$1</code>').replace(/^[-*] (.+)$/gm,'<li>$1</li>').replace(/(<li>[\s\S]*?<\/li>\n?)+/g,m=>'<ul style="padding-left:1.3rem;margin:.5rem 0;">'+m+'</ul>').replace(/\n\n+/g,'</p><p>').replace(/^(?!<[hulo])/gm,s=>s.trim()?'<p>'+s+'</p>':'').replace(/<p><\/p>/g,'');}
+
+// Dark mode
+const savedTheme=localStorage.getItem('ksi_theme')||'light';
+if(savedTheme==='dark') document.documentElement.setAttribute('data-theme','dark');
+window.toggleDark=()=>{const dark=document.documentElement.getAttribute('data-theme')==='dark';document.documentElement.setAttribute('data-theme',dark?'light':'dark');$('darkToggle').textContent=dark?'🌙':'☀️';$('darkChk').checked=!dark;localStorage.setItem('ksi_theme',dark?'light':'dark');};
+
+// Google Sheets
+async function sheetsPost(action,data){
+  try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,...data})});return true;}catch{return null;}
+}
+function updateSheetsStatus(ok){$('sheetsDot').className='sheets-dot '+(ok?'ok':'err');$('sheetsStatus').textContent=ok?'Sheets ✓':'Sheets';}
+
+// Auth UI
+window.switchTab=tab=>{$('tabLogin').classList.toggle('active',tab==='login');$('tabSignup').classList.toggle('active',tab==='signup');$('loginForm').style.display=tab==='login'?'':'none';$('signupForm').style.display=tab==='signup'?'':'none';$('resetForm').style.display='none';};
+window.showReset=()=>{$('loginForm').style.display='none';$('signupForm').style.display='none';$('resetForm').style.display='';};
+function fbErr(c){return({'auth/email-already-in-use':'An account with this email already exists.','auth/invalid-email':'Please enter a valid email.','auth/wrong-password':'Incorrect email or password.','auth/user-not-found':'No account found with this email.','auth/invalid-credential':'Incorrect email or password.','auth/weak-password':'Password must be at least 6 characters.','auth/too-many-requests':'Too many attempts. Please wait.','auth/popup-closed-by-user':'Window was closed. Try again.'}[c])||'Something went wrong. Please try again.';}
+function showErr(id,m){$(id).textContent=m;$(id).classList.add('show');}
+function showOk(id,m){$(id).textContent=m;$(id).classList.add('show');}
+
+window.doSignup=async()=>{
+  const name=$('signupName').value.trim(),email=$('signupEmail').value.trim(),pass=$('signupPass').value;
+  $('signupErr').classList.remove('show');$('signupOk').classList.remove('show');
+  if(!name||!email||!pass)return showErr('signupErr','Please fill in all fields.');
+  if(pass.length<6)return showErr('signupErr','Password must be at least 6 characters.');
+  $('signupBtn').disabled=true;
+  try{const cred=await createUserWithEmailAndPassword(auth,email,pass);await updateProfile(cred.user,{displayName:name});showOk('signupOk','Account created! Signing you in…');await sheetsPost('addUser',{uid:cred.user.uid,name,email,joined:new Date().toISOString(),provider:'email'});}
+  catch(e){showErr('signupErr',fbErr(e.code));$('signupBtn').disabled=false;}
+};
+window.doLogin=async()=>{
+  const email=$('loginEmail').value.trim(),pass=$('loginPass').value;
+  $('loginErr').classList.remove('show');
+  if(!email||!pass)return showErr('loginErr','Enter your email and password.');
+  $('loginBtn').disabled=true;
+  try{await signInWithEmailAndPassword(auth,email,pass);}
+  catch(e){showErr('loginErr',fbErr(e.code));$('loginBtn').disabled=false;}
+};
+window.doGoogle=async()=>{
+  try{const r=await signInWithPopup(auth,gProv);await sheetsPost('addUser',{uid:r.user.uid,name:r.user.displayName,email:r.user.email,joined:new Date().toISOString(),provider:'google'});}
+  catch(e){const el=$('loginForm').style.display!=='none'?$('loginErr'):$('signupErr');showErr(el.id,fbErr(e.code));}
+};
+window.doReset=async()=>{
+  const email=$('resetEmail').value.trim();
+  $('resetErr').classList.remove('show');$('resetOk').classList.remove('show');
+  if(!email)return showErr('resetErr','Please enter your email.');
+  try{await sendPasswordResetEmail(auth,email);showOk('resetOk','Reset email sent! Check your inbox.');}
+  catch(e){showErr('resetErr',fbErr(e.code));}
+};
+window.doLogout=()=>signOut(auth);
+
+onAuthStateChanged(auth,async user=>{
+  setTimeout(()=>{$('splash').classList.add('hide');setTimeout(()=>$('splash').style.display='none',500);},900);
+  if(user){
+    CU=user;
+    const init=(user.displayName||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    $('uAvatar').innerHTML=user.photoURL?`<img src="${user.photoURL}"/>`:init;
+    $('uName').textContent=(user.displayName||user.email||'').split(' ')[0];
+    const h=new Date().getHours();
+    $('dashGreet').textContent=`${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}, ${(user.displayName||'there').split(' ')[0]}! 👋`;
+    $('authWrap').classList.remove('show');$('appWrap').classList.add('show');
+    loadHistory();
+    const prefs=JSON.parse(localStorage.getItem('ksi_prefs')||'{}');
+    if(prefs.autoSave){$('saveChk').checked=true;$('autoSaveChk').checked=true;}
+    if(savedTheme==='dark'){$('darkToggle').textContent='☀️';$('darkChk').checked=true;}
+    // Test Sheets connection
+    try{const r=await fetch(SCRIPT_URL);updateSheetsStatus(r.ok);}catch{updateSheetsStatus(false);}
+  }else{
+    CU=null;$('authWrap').classList.add('show');$('appWrap').classList.remove('show');
+    ['loginBtn','signupBtn'].forEach(id=>{if($(id))$(id).disabled=false;});
+  }
+});
+
+window.nav=(pageId,btn)=>{
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  $('page-'+pageId).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(pageId==='saved')loadSaved();
+  if(pageId==='dashboard')loadHistory();
+  if(pageId==='profile')loadProfilePage();
+};
+
+// History
+function getHistory(){return CU?JSON.parse(localStorage.getItem('ksi_hist_'+CU.uid)||'[]'):[]; }
+function addHistory(type,title){
+  if(!CU)return;
+  const icons={notes:'📝',pdf:'📄',youtube:'▶️',lecture:'🎙️',flashcards:'🃏',quiz:'🎯',summary:'⚡'};
+  const item={type,title:title.slice(0,80),time:new Date().toISOString(),icon:icons[type]||'📄'};
+  localStorage.setItem('ksi_hist_'+CU.uid,JSON.stringify([item,...getHistory()].slice(0,50)));
+  sheetsPost('addActivity',{uid:CU.uid,email:CU.email,...item});
+  loadHistory();
+}
+function loadHistory(){
+  const list=$('histList'),hist=getHistory();
+  if(!hist.length){list.innerHTML='<div class="h-empty">No activity yet — pick a tool above!</div>';return;}
+  list.innerHTML=hist.slice(0,10).map(h=>`<div class="h-item"><div class="h-icon">${h.icon||'📄'}</div><div><div class="h-title">${esc(h.title)}</div><div class="h-meta">${h.type} · ${timeAgo(h.time)}</div></div></div>`).join('');
+}
+
+// Saved notes
+function getSaved(){return CU?JSON.parse(localStorage.getItem('ksi_notes_'+CU.uid)||'[]'):[]; }
+async function saveNote(title,html){
+  if(!CU)return;
+  const note={id:Date.now(),title:title.slice(0,100),content:html,created:new Date().toISOString()};
+  localStorage.setItem('ksi_notes_'+CU.uid,JSON.stringify([note,...getSaved()].slice(0,100)));
+  await sheetsPost('addNote',{uid:CU.uid,email:CU.email,title:note.title,preview:html.replace(/<[^>]+>/g,'').slice(0,200),created:note.created});
+  toast('Saved to library! 💾');
+}
+function loadSaved(){
+  const list=$('savedList'),notes=getSaved();
+  if(!notes.length){list.innerHTML='<div class="h-empty">No saved notes yet. Generate notes and tick "Save to library"!</div>';return;}
+  list.innerHTML='';
+  notes.forEach(n=>{
+    const div=document.createElement('div');div.className='s-item';
+    div.innerHTML=`<div style="flex:1;"><div class="s-title">${esc(n.title)}</div><div class="s-preview">${esc(n.content.replace(/<[^>]+>/g,'').slice(0,130))}…</div><div class="s-meta">${timeAgo(n.created)}</div></div><div style="display:flex;gap:.4rem;flex-shrink:0;"><button class="btn-del" data-exp>📥 PDF</button><button class="btn-del" data-del>🗑</button></div>`;
+    div.querySelector('[data-del]').onclick=()=>{if(!confirm('Delete?'))return;localStorage.setItem('ksi_notes_'+CU.uid,JSON.stringify(getSaved().filter(x=>x.id!==n.id)));toast('Deleted.');loadSaved();};
+    div.querySelector('[data-exp]').onclick=()=>{const t=document.createElement('div');t.innerHTML=n.content;exportPDFFromEl(t,n.title);};
+    $('savedList').appendChild(div);
+  });
+}
+
+// Profile
+function loadProfilePage(){
+  if(!CU)return;
+  const init=(CU.displayName||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  $('profAvatar').innerHTML=CU.photoURL?`<img src="${CU.photoURL}"/>`:init;
+  $('profName').textContent=CU.displayName||'—';$('profEmail').textContent=CU.email||'—';$('editName').value=CU.displayName||'';
+  const hist=getHistory();
+  $('stNotes').textContent=hist.filter(h=>['notes','pdf','youtube','lecture'].includes(h.type)).length;
+  $('stQuiz').textContent=hist.filter(h=>h.type==='quiz').length;
+  $('stCards').textContent=hist.filter(h=>h.type==='flashcards').length;
+}
+window.saveProfile=async()=>{const name=$('editName').value.trim();if(!name)return toast('Enter a name');await updateProfile(CU,{displayName:name});$('uName').textContent=name.split(' ')[0];$('profName').textContent=name;toast('Profile updated! ✓');};
+window.savePrefs=()=>{const p={autoSave:$('autoSaveChk').checked};localStorage.setItem('ksi_prefs',JSON.stringify(p));if(p.autoSave)$('saveChk').checked=true;};
+
+// Groq
+async function callGroq(sys,usr){
+  // Groq key loaded
+  const res=await fetch(GROQ_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},body:JSON.stringify({model:GROQ_MODEL,max_tokens:4096,temperature:0.7,messages:[{role:'system',content:sys},{role:'user',content:usr}]})});
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e?.error?.message||'API error '+res.status);}
+  return(await res.json()).choices?.[0]?.message?.content||'';
+}
+async function callGroqChunked(sys,text,size=10000){
+  const chunks=[];for(let i=0;i<text.length;i+=size)chunks.push(text.slice(i,i+size));
+  if(chunks.length===1)return callGroq(sys,text);
+  toast(`Processing ${chunks.length} sections…`,6000);
+  const results=[];
+  for(let i=0;i<chunks.length;i++){toast(`Section ${i+1} of ${chunks.length}…`,3000);results.push(await callGroq(sys+`\nSection ${i+1} of ${chunks.length}:`,chunks[i]));}
+  if(results.length>1){toast('Combining sections…',3000);return callGroq('Combine these note sections into one cohesive document. Remove duplicates. Use ## headings. Return clean markdown.',results.join('\n\n---\n\n'));}
+  return results[0];
+}
+const styleMap={concise:'Concise summary (200-300 words) with ## headings. Bold key terms.',detailed:'Detailed notes with ## headings and ### subheadings. Bold key concepts.',bullets:'## sections with bullet points only. Each bullet = one clear idea.',cornell:'Cornell format: ## Key Questions, ## Notes (detailed), ## Summary at bottom.',mindmap:'Hierarchical mind map: # Topic, ## Main branches, ### Sub-branches.'};
+
+// Smart Notes
+window.genNotes=async()=>{
+  const text=$('notesIn').value.trim();if(!text)return toast('Please paste some content first');
+  setLoad('notesBtn','notesSpin',true);
+  try{const result=await callGroqChunked(`Expert academic study assistant. Convert to well-structured study notes.\n${styleMap[$('notesStyle').value]}\nUse markdown. Stay accurate.`,text);const html=mdToHtml(result);$('notesContent').innerHTML=html;$('notesOut').classList.add('show');const title=text.split(' ').slice(0,7).join(' ')+'…';addHistory('notes',title);const prefs=JSON.parse(localStorage.getItem('ksi_prefs')||'{}');if($('saveChk').checked||prefs.autoSave)await saveNote(title,html);}
+  catch(e){toast('Error: '+e.message);}
+  setLoad('notesBtn','notesSpin',false);
+};
+
+// PDF
+window.dragOver=e=>{e.preventDefault();$('uploadZone').classList.add('drag');};
+window.dragLeave=()=>$('uploadZone').classList.remove('drag');
+window.dropFile=e=>{e.preventDefault();$('uploadZone').classList.remove('drag');const f=e.dataTransfer.files[0];if(f?.type==='application/pdf')handlePdf(f);else toast('Please drop a PDF file');};
+window.handlePdf=async file=>{
+  if(!file)return;
+  $('upIcon').textContent='⏳';$('upTitle').textContent='Reading PDF…';$('upSub').textContent=file.name;$('pdfProg').classList.add('show');$('pdfFill').style.width='0%';
+  try{
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const ab=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+    const maxP=Math.min(pdf.numPages,500);let text='';
+    for(let i=1;i<=maxP;i++){const page=await pdf.getPage(i);const c=await page.getTextContent();text+=c.items.map(s=>s.str).join(' ')+'\n';$('pdfFill').style.width=Math.round(i/maxP*100)+'%';$('pdfLbl').textContent=`Reading page ${i} of ${maxP}…`;}
+    pdfText=text.trim();if(!pdfText){toast('Could not extract text. PDF may be image-based.');return;}
+    $('uploadZone').classList.add('done');$('upIcon').textContent='✅';$('upTitle').textContent=file.name;$('upSub').textContent=`${maxP} pages · ${(pdfText.length/1000).toFixed(1)}k chars`;$('pdfLbl').textContent=`✓ ${maxP} pages extracted`;$('pdfBtn').disabled=false;toast(`PDF loaded — ${maxP} pages ready!`);
+  }catch(e){$('upIcon').textContent='❌';$('upTitle').textContent='Error';$('upSub').textContent=e.message;toast('Error: '+e.message);}
+};
+window.genPdf=async()=>{
+  if(!pdfText)return toast('Please upload a PDF first');setLoad('pdfBtn','pdfSpin',true);
+  try{const result=await callGroqChunked(`Expert study assistant. Text extracted from a PDF. Convert to study notes.\n${styleMap[$('pdfStyle').value]}\nIgnore page numbers/headers/footers. Use markdown.`,pdfText);const html=mdToHtml(result);$('pdfContent').innerHTML=html;$('pdfOut').classList.add('show');const title='PDF: '+$('upTitle').textContent;addHistory('pdf',title);const prefs=JSON.parse(localStorage.getItem('ksi_prefs')||'{}');if(prefs.autoSave)await saveNote(title,html);}
+  catch(e){toast('Error: '+e.message);}setLoad('pdfBtn','pdfSpin',false);
+};
+window.clearPdf=()=>{$('pdfOut').classList.remove('show');$('uploadZone').classList.remove('done');$('upIcon').textContent='📄';$('upTitle').textContent='Click to upload or drag & drop your PDF';$('upSub').textContent='Supports PDF files up to 500 pages';$('pdfProg').classList.remove('show');$('pdfBtn').disabled=true;pdfText='';};
+
+// YouTube
+function getYtId(url){for(const p of[/youtu\.be\/([^?&\s]+)/,/[?&]v=([^?&\s]+)/,/\/shorts\/([^?&\s]+)/,/\/embed\/([^?&\s]+)/]){const m=url.match(p);if(m)return m[1];}return null;}
+window.previewYt=()=>{const id=getYtId($('ytUrl').value.trim());if(!id)return toast('Invalid YouTube URL');$('ytThumb').src=`https://img.youtube.com/vi/${id}/mqdefault.jpg`;$('ytTitle').textContent='Video ID: '+id;$('ytPreview').style.display='block';};
+window.genYt=async()=>{
+  const url=$('ytUrl').value.trim();if(!url)return toast('Please paste a YouTube URL');
+  const id=getYtId(url);if(!id)return toast('Could not find a valid YouTube video ID');
+  setLoad('ytBtn','ytSpin',true);$('ytThumb').src=`https://img.youtube.com/vi/${id}/mqdefault.jpg`;$('ytTitle').textContent='Fetching transcript…';$('ytPreview').style.display='block';
+  try{
+    let transcriptText='';
+    for(const ep of[`https://yt-transcript-api.vercel.app/api/transcript?videoId=${id}`,`https://api.kome.ai/api/tools/youtube-transcripts?videoId=${id}`]){
+      try{const r=await fetch(ep);if(r.ok){const d=await r.json();if(Array.isArray(d))transcriptText=d.map(s=>s.text||'').join(' ');else if(d.transcript)transcriptText=d.transcript;if(transcriptText.length>100)break;}}catch{}
+    }
+    let result;
+    if(transcriptText.length>100){
+      $('ytTitle').textContent='Transcript found — generating notes…';
+      result=await callGroqChunked(`Expert study assistant. This is a YouTube transcript (URL: ${url}). Convert to well-structured study notes. Remove filler words.\n${styleMap[$('ytStyle').value]}\nUse markdown.`,transcriptText);
+    }else{
+      $('ytTitle').textContent='Generating notes from video info…';
+      result=await callGroq(`Expert study assistant. Generate comprehensive study notes for a YouTube video. Format with ## headings and bullet points.`,`YouTube URL: ${url}\nVideo ID: ${id}\nTranscript unavailable. Generate the best possible study notes based on the video URL/topic. Ask the user to paste the transcript or description below for better results.`);
+    }
+    const html=mdToHtml(result);$('ytContent').innerHTML=html;$('ytOut').classList.add('show');
+    $('ytTitle').textContent=transcriptText.length>100?'✅ Notes from transcript':'Notes generated';
+    addHistory('youtube','YouTube: '+url.slice(0,55));
+    const prefs=JSON.parse(localStorage.getItem('ksi_prefs')||'{}');if(prefs.autoSave)await saveNote('YouTube: '+url.slice(0,60),html);
+  }catch(e){toast('Error: '+e.message);}setLoad('ytBtn','ytSpin',false);
+};
+
+// Lecture Recorder
+window.toggleRec=async()=>{if(!mediaRec||mediaRec.state==='inactive')await startRec();else stopRec();};
+async function startRec(){
+  transcript='';$('transcriptTxt').value='';
+  try{
+    if('webkitSpeechRecognition' in window||'SpeechRecognition' in window){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;recognition=new SR();recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';recognition.onresult=e=>{let fin='',int='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)fin+=e.results[i][0].transcript+' ';else int+=e.results[i][0].transcript;}transcript+=fin;$('transcriptTxt').value=transcript+int;$('transcriptTxt').scrollTop=$('transcriptTxt').scrollHeight;};recognition.onerror=e=>{if(e.error!=='no-speech')toast('Mic: '+e.error);};recognition.start();}
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});mediaRec=new MediaRecorder(stream);mediaRec.start(1000);
+    recSecs=0;$('recTime').style.display='inline';
+    recInterval=setInterval(()=>{recSecs++;$('recTime').textContent=String(Math.floor(recSecs/60)).padStart(2,'0')+':'+String(recSecs%60).padStart(2,'0');},1000);
+    $('recBtn').classList.replace('idle','on');$('recLbl').textContent='Stop Recording';toast('Recording started 🎙️');
+  }catch(e){toast('Mic access denied. Please allow microphone access.');}
+}
+function stopRec(){
+  if(recognition){recognition.stop();recognition=null;}
+  if(mediaRec&&mediaRec.state!=='inactive'){mediaRec.stop();mediaRec.stream.getTracks().forEach(t=>t.stop());}
+  clearInterval(recInterval);$('recBtn').classList.replace('on','idle');$('recLbl').textContent='Start Recording';
+  if($('transcriptTxt').value.trim()||transcript.trim()){$('transcriptArea').style.display='block';toast('Recording stopped! Review transcript then click Generate Notes.');}
+  else{$('recTime').style.display='none';toast('No speech detected. Try again.');}
+}
+window.genLecture=async()=>{
+  const text=$('transcriptTxt').value.trim();if(!text)return toast('No transcript available');
+  setLoad('lectBtn','lectSpin',true);
+  try{const result=await callGroqChunked(`Expert note-taker. Live lecture transcript. Convert to clean study notes. Remove filler words.\n${styleMap[$('lectStyle').value]}\nUse markdown.`,text);const html=mdToHtml(result);$('lectContent').innerHTML=html;$('lectOut').classList.add('show');const title='Lecture: '+new Date().toLocaleDateString();addHistory('lecture',title);const prefs=JSON.parse(localStorage.getItem('ksi_prefs')||'{}');if(prefs.autoSave)await saveNote(title,html);}
+  catch(e){toast('Error: '+e.message);}setLoad('lectBtn','lectSpin',false);
+};
+window.clearLect=()=>{$('lectOut').classList.remove('show');$('transcriptTxt').value='';$('transcriptArea').style.display='none';$('recTime').style.display='none';transcript='';};
+
+// Flashcards
+window.genFc=async()=>{
+  const text=$('fcIn').value.trim();if(!text)return toast('Please paste some content first');const count=$('fcNum').value;setLoad('fcBtn','fcSpin',true);
+  try{const result=await callGroq(`Generate exactly ${count} flashcards. Return ONLY a valid JSON array, no markdown fences.\nFormat: [{"front":"question or term","back":"answer (1-3 sentences)"}]`,text.slice(0,12000));const cards=JSON.parse(result.replace(/```json|```/g,'').trim());$('fcLbl').textContent=`${cards.length} cards — click any card to flip`;$('fcGrid').innerHTML=cards.map((c,i)=>`<div class="fc" id="fc${i}" onclick="this.classList.toggle('flipped')"><div class="fc-inner"><div class="fc-front"><div class="fc-tag">Question</div><div class="fc-text">${esc(c.front)}</div><div class="fc-hint">tap to flip →</div></div><div class="fc-back"><div class="fc-tag">Answer</div><div class="fc-text">${esc(c.back)}</div></div></div></div>`).join('');$('fcSection').style.display='block';addHistory('flashcards',$('fcIn').value.split(' ').slice(0,7).join(' ')+'…');}
+  catch(e){toast('Could not parse flashcards. Try again.');}setLoad('fcBtn','fcSpin',false);
+};
+window.clearFc=()=>{$('fcSection').style.display='none';$('fcIn').value='';};
+
+// Quiz
+window.genQuiz=async()=>{
+  const text=$('quizIn').value.trim();if(!text)return toast('Please paste some content first');const count=$('quizNum').value;setLoad('quizBtn','quizSpin',true);
+  try{const result=await callGroq(`Generate exactly ${count} multiple-choice questions. Return ONLY a valid JSON array, no markdown fences.\nFormat: [{"question":"...","options":["A","B","C","D"],"answer":0,"explanation":"why correct (1-2 sentences)"}]\n"answer" is 0-based index.`,text.slice(0,12000));quizData=JSON.parse(result.replace(/```json|```/g,'').trim());quizDone=false;renderQuiz();addHistory('quiz',$('quizIn').value.split(' ').slice(0,7).join(' ')+'…');}
+  catch(e){toast('Could not parse quiz. Try again.');}setLoad('quizBtn','quizSpin',false);
+};
+function renderQuiz(){const L=['A','B','C','D'];$('scoreBar').classList.remove('show');$('submitBtn').style.display='inline-flex';$('quizQs').innerHTML=quizData.map((q,qi)=>`<div class="quiz-q"><div class="q-num">Question ${qi+1} of ${quizData.length}</div><div class="q-text">${esc(q.question)}</div><div class="opts" id="opts${qi}">${q.options.map((o,oi)=>`<button class="opt" data-oi="${oi}" onclick="selOpt(${qi},${oi})"><span class="opt-l">${L[oi]}</span><span>${esc(o)}</span></button>`).join('')}</div><div class="explain" id="exp${qi}">${esc(q.explanation)}</div></div>`).join('');$('quizSection').style.display='block';}
+window.selOpt=(qi,oi)=>{if(quizDone)return;document.querySelectorAll(`#opts${qi} .opt`).forEach(o=>{o.style.borderColor='';o.style.background='';delete o.dataset.sel;});const el=document.querySelector(`#opts${qi} .opt[data-oi="${oi}"]`);el.style.borderColor='var(--accent)';el.style.background='var(--accent-bg)';el.dataset.sel='1';};
+window.submitQuiz=()=>{quizDone=true;let correct=0;quizData.forEach((q,qi)=>{const opts=document.querySelectorAll(`#opts${qi} .opt`);const sel=[...opts].findIndex(o=>o.dataset.sel==='1');opts.forEach(o=>{o.disabled=true;o.style.borderColor='';o.style.background='';});if(sel===-1)opts[q.answer].classList.add('correct');else if(sel===q.answer){opts[sel].classList.add('correct');correct++;}else{opts[sel].classList.add('wrong');opts[q.answer].classList.add('correct');}$('exp'+qi).classList.add('show');});const pct=Math.round(correct/quizData.length*100);$('scoreNum').textContent=`${correct}/${quizData.length}`;$('scoreTxt').textContent=`${pct}% — ${pct>=80?'Excellent! 🎉':pct>=60?'Good effort — review the explanations.':'Keep studying 💪'}`;$('scoreBar').classList.add('show');$('submitBtn').style.display='none';$('scoreBar').scrollIntoView({behavior:'smooth',block:'nearest'});};
+window.retryQuiz=()=>{quizDone=false;renderQuiz();};
+window.clearQuiz=()=>{$('quizSection').style.display='none';$('quizIn').value='';quizData=[];};
+
+// Summary
+window.genSum=async()=>{
+  const text=$('sumIn').value.trim();if(!text)return toast('Please paste some content first');
+  const lenMap={short:'3-4 sentence TL;DR.',medium:'Single clear paragraph (100-150 words).',long:'## Key Points bullet list then ## Conclusion.'};
+  setLoad('sumBtn','sumSpin',true);
+  try{const result=await callGroqChunked(`Expert summarizer. Accurate and faithful to source. ${lenMap[$('sumLen').value]}`,text);$('sumContent').innerHTML=mdToHtml(result);$('sumOut').classList.add('show');addHistory('summary',$('sumIn').value.split(' ').slice(0,7).join(' ')+'…');}
+  catch(e){toast('Error: '+e.message);}setLoad('sumBtn','sumSpin',false);
+};
+
+// Export PDF
+window.exportPDF=(id,title)=>{const el=$(id);if(!el?.innerHTML.trim())return toast('Nothing to export yet');exportPDFFromEl(el,title);};
+function exportPDFFromEl(el,title){
+  try{const {jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});const margin=18,maxW=pdf.internal.pageSize.getWidth()-margin*2;let y=margin;pdf.setFont('helvetica','bold');pdf.setFontSize(16);pdf.setTextColor(14,165,233);pdf.text('KSI-AI',margin,y);y+=7;pdf.setTextColor(24,24,27);pdf.setFontSize(13);pdf.text(title||'Study Notes',margin,y);y+=5;pdf.setDrawColor(229,229,224);pdf.line(margin,y,pdf.internal.pageSize.getWidth()-margin,y);y+=6;pdf.setFont('helvetica','normal');pdf.setFontSize(10);pdf.setTextColor(100,100,100);pdf.text('Generated by KSI-AI · '+new Date().toLocaleDateString(),margin,y);y+=8;pdf.setTextColor(24,24,27);pdf.setFontSize(11);(el.innerText||'').split('\n').filter(l=>l.trim()).forEach(line=>{const t=line.trim();if(!t)return;const isH=t.length<100&&(t.match(/^#{1,3}\s/)||t.toUpperCase()===t&&t.length<60);if(isH){if(y>260){pdf.addPage();y=margin;}pdf.setFont('helvetica','bold');pdf.setFontSize(12);pdf.setTextColor(14,165,233);const w=pdf.splitTextToSize(t.replace(/^#+\s*/,''),maxW);pdf.text(w,margin,y);y+=w.length*6+3;pdf.setFont('helvetica','normal');pdf.setFontSize(11);pdf.setTextColor(24,24,27);}else{const w=pdf.splitTextToSize(t,maxW);if(y+w.length*5.5>275){pdf.addPage();y=margin;}pdf.text(w,margin,y);y+=w.length*5.5+2;}});pdf.save((title||'KSI-AI-Notes').replace(/[^a-z0-9]/gi,'_')+'.pdf');toast('PDF exported! 📥');}catch(e){toast('Export failed: '+e.message);}
+}
+
+window.clearOut=(o,i)=>{$(o).classList.remove('show');if(i&&$(i))$(i).value='';};
+window.copyEl=id=>navigator.clipboard.writeText($(id).innerText).then(()=>toast('Copied!')).catch(()=>toast('Copy failed'));
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName!=='TEXTAREA'){if($('loginForm').style.display!=='none')doLogin();else if($('signupForm').style.display!=='none')doSignup();}});
+if(typeof pdfjsLib!=='undefined')pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+</script>
+</body>
+</html>
