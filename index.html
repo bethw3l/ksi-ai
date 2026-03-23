@@ -362,7 +362,18 @@ select:focus{border-color:var(--a1);}
 .pomo-label{font-size:.75rem;color:var(--muted);letter-spacing:.06em;}
 .pomo-btns{display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem;}
 
-/* ── RESPONSIVE ── */
+/* ── ENGINE PILLS ── */
+.engine-pill{background:var(--bg2);border:2px solid var(--border2);border-radius:11px;padding:.75rem .6rem;text-align:center;cursor:pointer;transition:all .2s;}
+.engine-pill:hover{border-color:var(--a1);background:rgba(124,92,252,.06);}
+.engine-pill.active{border-color:var(--a1);background:rgba(124,92,252,.12);box-shadow:0 0 16px rgba(124,92,252,.2);}
+.ep-name{font-family:var(--display);font-weight:800;font-size:1rem;color:var(--text);margin-bottom:.15rem;}
+.ep-model{font-size:.68rem;color:var(--muted);margin-bottom:.35rem;}
+.ep-tag{font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:100px;display:inline-block;}
+.ep-tag.ok{background:rgba(64,232,160,.15);color:var(--a5);border:1px solid rgba(64,232,160,.3);}
+.ep-tag.err{background:rgba(255,96,144,.1);color:var(--a3);border:1px solid rgba(255,96,144,.3);}
+.ep-tag.none{background:var(--surface2);color:var(--muted);border:1px solid var(--border2);}
+.ep-tag.active{background:rgba(124,92,252,.2);color:var(--a1);border:1px solid rgba(124,92,252,.4);}
+
 @media(max-width:860px){aside{display:none;}main{padding:1.5rem 1.25rem;}.dash-grid{grid-template-columns:1fr 1fr;}.stats-strip{grid-template-columns:1fr 1fr;}}
 @media(max-width:540px){.dash-grid{grid-template-columns:1fr;}.stats-strip{grid-template-columns:1fr 1fr;}.fc-grid{grid-template-columns:1fr;}}
 </style>
@@ -923,6 +934,69 @@ select:focus{border-color:var(--a1);}
           </div>
           <div>
             <div class="card">
+              <div style="font-family:var(--display);font-weight:700;margin-bottom:1.1rem;font-size:1rem;">🤖 AI Engine</div>
+
+              <!-- Engine selector pills -->
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.2rem;">
+                <div class="engine-pill" id="pill-bett1" onclick="selectEngine('bett1')" title="Groq — Llama 3.3 70B · Fast & free · console.groq.com/keys">
+                  <div class="ep-name">Bett1</div>
+                  <div class="ep-model">Groq · Llama 3.3</div>
+                  <div class="ep-tag" id="tag-bett1">—</div>
+                </div>
+                <div class="engine-pill" id="pill-bett2" onclick="selectEngine('bett2')" title="Gemini 2.0 Flash · Strongest free tier · aistudio.google.com">
+                  <div class="ep-name">Bett2</div>
+                  <div class="ep-model">Gemini 2.0</div>
+                  <div class="ep-tag" id="tag-bett2">—</div>
+                </div>
+                <div class="engine-pill" id="pill-bett3" onclick="selectEngine('bett3')" title="DeepSeek V3 via OpenRouter · Smart & free · openrouter.ai/keys">
+                  <div class="ep-name">Bett3</div>
+                  <div class="ep-model">DeepSeek V3</div>
+                  <div class="ep-tag" id="tag-bett3">—</div>
+                </div>
+              </div>
+
+              <!-- Key inputs — each provider now supports multiple backup keys -->
+              <div style="display:flex;flex-direction:column;gap:.65rem;">
+                <div>
+                  <label style="font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem;">
+                    <span>🟣 Bett1 Keys — Groq</span>
+                    <a href="https://console.groq.com/keys" target="_blank" style="color:var(--a1);font-size:.68rem;text-decoration:none;">Get free key ↗</a>
+                  </label>
+                  <div id="bett1KeysList" style="display:flex;flex-direction:column;gap:.35rem;"></div>
+                  <button class="btn btn-g btn-sm" onclick="addKeyField('bett1')" style="margin-top:.35rem;width:100%;font-size:.75rem;">+ Add backup Bett1 key</button>
+                </div>
+                <div>
+                  <label style="font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem;">
+                    <span>🔵 Bett2 Keys — Gemini</span>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--a1);font-size:.68rem;text-decoration:none;">Get free key ↗</a>
+                  </label>
+                  <div id="bett2KeysList" style="display:flex;flex-direction:column;gap:.35rem;"></div>
+                  <button class="btn btn-g btn-sm" onclick="addKeyField('bett2')" style="margin-top:.35rem;width:100%;font-size:.75rem;">+ Add backup Bett2 key</button>
+                </div>
+                <div>
+                  <label style="font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem;">
+                    <span>🟢 Bett3 Keys — DeepSeek</span>
+                    <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--a1);font-size:.68rem;text-decoration:none;">Get free key ↗</a>
+                  </label>
+                  <div id="bett3KeysList" style="display:flex;flex-direction:column;gap:.35rem;"></div>
+                  <button class="btn btn-g btn-sm" onclick="addKeyField('bett3')" style="margin-top:.35rem;width:100%;font-size:.75rem;">+ Add backup Bett3 key</button>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:.5rem;margin-top:1rem;">
+                <button class="btn btn-p" onclick="saveEngineSettings()" style="flex:1;" id="saveEngineBtn">💾 Save</button>
+                <button class="btn btn-g btn-sm" onclick="clearBlacklist()" title="Un-disable all temporarily blocked keys">🔄 Reset blocked keys</button>
+              </div>
+              <div id="engineSaveMsg" style="display:none;text-align:center;font-size:.78rem;color:var(--a5);margin-top:.5rem;">✅ Saved!</div>
+
+              <div style="margin-top:.85rem;padding:.65rem .85rem;background:var(--bg2);border-radius:9px;border:1px solid var(--border2);">
+                <div style="font-size:.72rem;color:var(--muted);line-height:1.7;">
+                  <strong style="color:var(--text2);">🛡 Self-healing:</strong> If a key gets disabled or rate-limited, KSI-AI automatically skips it and tries your next backup key. Dead keys are auto-detected and shown in red. Click <strong style="color:var(--text);">"Reset blocked keys"</strong> to retry them after getting new ones. Keys never leave your device.
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:1rem;">
               <div style="font-family:var(--display);font-weight:700;margin-bottom:1rem;">⚙️ Preferences</div>
               <div class="toggle-row">
                 <div><div class="tgl-lbl">Auto-save Notes</div><div class="tgl-sub">Automatically save all generated notes</div></div>
@@ -953,7 +1027,6 @@ select:focus{border-color:var(--a1);}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const GROQ_KEY   = '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';
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztoi_hD0_tA8f5-oli4l9-p-5VsDuaKYY9hTAcau8YBLtaZs4k_Mldy3bWbTRD-_j2EQ/exec';
 const firebaseConfig = {
   apiKey:"AIzaSyBhODUaW1lFM6p4vsIoIGmfrBb10XlDndE",authDomain:"ksi-ai.firebaseapp.com",
@@ -963,14 +1036,294 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const auth  = getAuth(fbApp);
 const gProv = new GoogleAuthProvider();
-const GROQ_URL   = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+// ═══════════════════════════════════════════════════════════════
+// ██  KSI-AI MULTI-PROVIDER ENGINE  ██
+// Bett1 = Groq (Llama 3.3 70B)   → console.groq.com/keys
+// Bett2 = Gemini (2.0 Flash)      → aistudio.google.com/apikey
+// Bett3 = DeepSeek (via OpenRouter) → openrouter.ai/keys
+// User picks their engine in Profile → AI Engine Settings
+// If chosen engine fails, others auto-kick in as silent backup
+// ═══════════════════════════════════════════════════════════════
 
+// ── Fixed provider URLs / models ──
+const GEMINI_URL       = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=';
+const OPENROUTER_URL   = 'https://openrouter.ai/api/v1/chat/completions';
+const OPENROUTER_MODEL = 'deepseek/deepseek-chat-v3-0324:free';
+const GROQ_URL         = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL       = 'llama-3.3-70b-versatile';
+
+// ══════════════════════════════════════════════════════════════════
+// ██  KEY VAULT  ██
+// Each provider holds an array of keys — primary + as many backups
+// as the user wants. When a key is detected as dead (401/403/429
+// with "revoked" or "invalid"), it is auto-blacklisted and the next
+// key in the pool is tried automatically. Blacklist expires after
+// 10 minutes (in case of temporary rate-limits).
+// ══════════════════════════════════════════════════════════════════
+
+// Built-in default key pools — user can add more in Settings
+const DEFAULT_KEYS = {
+  bett1: ['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'],
+  bett2: ['AIzaSyDGmq3FBqALbqMG3Yifu-2z2sTkO5tpGwE'],
+  bett3: ['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'],
+};
+
+// Blacklist: { 'key_string': timestamp_when_blacklisted }
+let keyBlacklist = JSON.parse(sessionStorage.getItem('ksi_blacklist') || '{}');
+const BLACKLIST_TTL = 10 * 60 * 1000; // 10 minutes
+
+function isBlacklisted(key) {
+  const ts = keyBlacklist[key];
+  if (!ts) return false;
+  if (Date.now() - ts > BLACKLIST_TTL) { delete keyBlacklist[key]; return false; }
+  return true;
+}
+function blacklistKey(key, reason) {
+  keyBlacklist[key] = Date.now();
+  sessionStorage.setItem('ksi_blacklist', JSON.stringify(keyBlacklist));
+  console.warn(`🔑 Key blacklisted (${reason}):`, key.slice(0,12)+'…');
+  showKeyAlert(key, reason);
+}
+function clearBlacklist() {
+  keyBlacklist = {};
+  sessionStorage.removeItem('ksi_blacklist');
+  toast('🔄 All key blacklists cleared — retrying all keys', 3000);
+  renderEnginePills();
+}
+
+// Show a dismissable banner when a key dies
+function showKeyAlert(key, reason) {
+  const existing = document.getElementById('keyAlertBanner');
+  if (existing) existing.remove();
+  const banner = document.createElement('div');
+  banner.id = 'keyAlertBanner';
+  banner.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:9998;background:rgba(255,96,144,.15);border:1px solid rgba(255,96,144,.4);border-radius:11px;padding:.65rem 1.1rem;font-size:.82rem;color:#ff9090;display:flex;align-items:center;gap:.75rem;max-width:500px;backdrop-filter:blur(12px);';
+  banner.innerHTML = `<span>⚠️ A key was auto-disabled (${reason}). Backup keys are active.</span><a href="#" onclick="nav('profile',document.querySelector('[data-page=profile]'));this.closest('#keyAlertBanner').remove();" style="color:var(--a1);font-weight:600;white-space:nowrap;text-decoration:none;">Fix in Settings →</a><button onclick="this.closest('#keyAlertBanner').remove()" style="background:none;border:none;color:#ff9090;cursor:pointer;font-size:1rem;padding:0 .25rem;">✕</button>`;
+  document.body.appendChild(banner);
+  setTimeout(() => banner?.remove(), 12000);
+}
+
+// ── Config: chosen provider + key pools ──
+function loadEngineConfig() {
+  const saved = JSON.parse(localStorage.getItem('ksi_engine') || '{}');
+  return {
+    chosen:    saved.chosen    || 'bett2',
+    bett1Keys: saved.bett1Keys || [...DEFAULT_KEYS.bett1],
+    bett2Keys: saved.bett2Keys || [...DEFAULT_KEYS.bett2],
+    bett3Keys: saved.bett3Keys || [...DEFAULT_KEYS.bett3],
+    // Legacy single-key support
+    get bett1Key() { return this.bett1Keys[0] || ''; },
+    get bett2Key() { return this.bett2Keys[0] || ''; },
+    get bett3Key() { return this.bett3Keys[0] || ''; },
+  };
+}
+function saveEngineConfig(cfg) {
+  const toSave = { chosen: cfg.chosen, bett1Keys: cfg.bett1Keys, bett2Keys: cfg.bett2Keys, bett3Keys: cfg.bett3Keys };
+  localStorage.setItem('ksi_engine', JSON.stringify(toSave));
+}
+
+// Get the next live key for a provider (skips blacklisted ones)
+function getLiveKeys(providerName) {
+  const cfg = loadEngineConfig();
+  const pool = cfg[providerName + 'Keys'] || [];
+  const live = pool.filter(k => k && k.length > 8 && !isBlacklisted(k));
+  return live;
+}
+
+// Decide if an error means the key is permanently dead vs temporarily unavailable
+function isDeadKeyError(status, message = '') {
+  const msg = message.toLowerCase();
+  if (status === 401) return true; // Always dead
+  if (status === 403) return true; // Always dead / revoked
+  if (status === 429 && (msg.includes('revok') || msg.includes('disabl') || msg.includes('invalid'))) return true;
+  return false;
+}
+
+let activeProvider = 'bett2';
+
+// ── Raw provider callers — each accepts a single key ──
+async function callGeminiRaw(key, sys, usr, temp=0.7) {
+  const body = { contents:[{role:'user',parts:[{text:sys+'\n\n'+usr}]}], generationConfig:{temperature:temp,maxOutputTokens:4096} };
+  const res = await fetch(GEMINI_URL + key, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:AbortSignal.timeout(30000) });
+  if (!res.ok) {
+    const e = await res.json().catch(()=>({}));
+    const msg = e?.error?.message || '';
+    if (isDeadKeyError(res.status, msg)) blacklistKey(key, msg||'status '+res.status);
+    throw new Error(msg || 'Bett2 error '+res.status);
+  }
+  const d = await res.json();
+  const text = d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  if (!text) throw new Error('Bett2 empty response');
+  return text;
+}
+
+async function callOpenRouterRaw(key, sys, usr, temp=0.7) {
+  const res = await fetch(OPENROUTER_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'HTTP-Referer':'https://ksi-ai.app','X-Title':'KSI-AI'},
+    body:JSON.stringify({model:OPENROUTER_MODEL,max_tokens:4096,temperature:temp,messages:[{role:'system',content:sys},{role:'user',content:usr}]}),
+    signal:AbortSignal.timeout(30000)
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(()=>({}));
+    const msg = e?.error?.message || '';
+    if (isDeadKeyError(res.status, msg)) blacklistKey(key, msg||'status '+res.status);
+    throw new Error(msg || 'Bett3 error '+res.status);
+  }
+  const text = (await res.json()).choices?.[0]?.message?.content || '';
+  if (!text) throw new Error('Bett3 empty response');
+  return text;
+}
+
+async function callGroqRaw(key, sys, usr, temp=0.7) {
+  const res = await fetch(GROQ_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({model:GROQ_MODEL,max_tokens:4096,temperature:temp,messages:[{role:'system',content:sys},{role:'user',content:usr}]}),
+    signal:AbortSignal.timeout(30000)
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(()=>({}));
+    const msg = e?.error?.message || '';
+    if (isDeadKeyError(res.status, msg)) blacklistKey(key, msg||'status '+res.status);
+    throw new Error(msg || 'Bett1 error '+res.status);
+  }
+  const text = (await res.json()).choices?.[0]?.message?.content || '';
+  if (!text) throw new Error('Bett1 empty response');
+  return text;
+}
+
+// ── Try a provider — rotates through all its live keys automatically ──
+async function tryProvider(name, sys, usr, temp) {
+  const liveKeys = getLiveKeys(name);
+  if (!liveKeys.length) throw new Error(`${name}: no live keys available`);
+  let lastErr = null;
+  for (const key of liveKeys) {
+    try {
+      let result = '';
+      if (name === 'bett1') result = await callGroqRaw(key, sys, usr, temp);
+      else if (name === 'bett2') result = await callGeminiRaw(key, sys, usr, temp);
+      else if (name === 'bett3') result = await callOpenRouterRaw(key, sys, usr, temp);
+      if (result && result.length > 10) return { result, name, key };
+    } catch(e) { lastErr = e; /* key may have been blacklisted — try next */ }
+  }
+  throw lastErr || new Error(`${name}: all keys exhausted`);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ██  MASTER callAI — self-healing race engine  ██
+// 1. Chosen engine fires immediately with key rotation
+// 2. Other two fire after 1s as async hot-standby
+// 3. Promise.any() — fastest valid winner used
+// 4. If all fail → clear error pointing to Settings
+// ══════════════════════════════════════════════════════════════════
+async function callAI(sys, usr, temp=0.7) {
+  const cfg = loadEngineConfig();
+  const chosen = cfg.chosen;
+  const others = ['bett1','bett2','bett3'].filter(p => p !== chosen);
+
+  function makeAttempt(name, delayMs=0) {
+    return new Promise(async (resolve, reject) => {
+      if (delayMs > 0) await new Promise(r => setTimeout(r, delayMs));
+      try {
+        const w = await tryProvider(name, sys, usr, temp);
+        resolve(w);
+      } catch(e) { reject(e); }
+    });
+  }
+
+  try {
+    const winner = await Promise.any([
+      makeAttempt(chosen, 0),
+      makeAttempt(others[0], 1000),
+      makeAttempt(others[1], 1200),
+    ]);
+    activeProvider = winner.name;
+    if (winner.name !== chosen) {
+      const labels = {bett1:'Bett1 (Groq)', bett2:'Bett2 (Gemini)', bett3:'Bett3 (DeepSeek)'};
+      toast(`⚡ ${labels[winner.name]} took over`, 2000);
+    }
+    return winner.result;
+  } catch(e) {
+    throw new Error('All AI engines failed — add fresh API keys in Profile → AI Engine Settings.');
+  }
+}
+
+const callGroq = callAI;
+
+// ── Chunked — all chunks run in parallel ──
+async function callGroqChunked(sys, text, size=9000) {
+  const chunks = [];
+  for (let i = 0; i < text.length; i += size) chunks.push(text.slice(i, i + size));
+  if (chunks.length === 1) return callAI(sys, text);
+  toast(`⚡ Processing ${chunks.length} sections in parallel…`, 5000);
+  const results = await Promise.all(chunks.map((chunk, i) => callAI(sys+`\n[Section ${i+1}/${chunks.length}]`, chunk)));
+  if (results.length > 1) {
+    toast('Combining sections…', 3000);
+    return callAI('Combine these note sections into one comprehensive, well-organized document. Remove duplicates. Use ## headings. Return clean markdown.', results.join('\n\n---\n\n'));
+  }
+  return results[0];
+}
+
+// ── Chat — same race engine with multi-turn support ──
+async function callAIChat(sys, messages, temp=0.8) {
+  const cfg = loadEngineConfig();
+  const chosen = cfg.chosen;
+  const others = ['bett1','bett2','bett3'].filter(p => p !== chosen);
+
+  async function tryChatProvider(name, delayMs=0) {
+    return new Promise(async (resolve, reject) => {
+      if (delayMs > 0) await new Promise(r => setTimeout(r, delayMs));
+      const liveKeys = getLiveKeys(name);
+      if (!liveKeys.length) return reject(new Error(name+' no live keys'));
+      for (const key of liveKeys) {
+        try {
+          let reply = '';
+          if (name === 'bett2') {
+            const contents = messages.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
+            const body = {system_instruction:{parts:[{text:sys}]},contents,generationConfig:{temperature:temp,maxOutputTokens:1500}};
+            const res = await fetch(GEMINI_URL+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
+            if (res.ok) { const d=await res.json(); reply=d?.candidates?.[0]?.content?.parts?.[0]?.text||''; }
+            else { const e=await res.json().catch(()=>({})); if(isDeadKeyError(res.status,e?.error?.message||''))blacklistKey(key,'chat '+res.status); }
+          } else if (name === 'bett1') {
+            const res = await fetch(GROQ_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:GROQ_MODEL,max_tokens:1500,temperature:temp,messages:[{role:'system',content:sys},...messages]}),signal:AbortSignal.timeout(20000)});
+            if (res.ok) reply=(await res.json()).choices?.[0]?.message?.content||'';
+            else { const e=await res.json().catch(()=>({})); if(isDeadKeyError(res.status,e?.error?.message||''))blacklistKey(key,'chat '+res.status); }
+          } else if (name === 'bett3') {
+            const res = await fetch(OPENROUTER_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'HTTP-Referer':'https://ksi-ai.app','X-Title':'KSI-AI'},body:JSON.stringify({model:OPENROUTER_MODEL,max_tokens:1500,temperature:temp,messages:[{role:'system',content:sys},...messages]}),signal:AbortSignal.timeout(20000)});
+            if (res.ok) reply=(await res.json()).choices?.[0]?.message?.content||'';
+            else { const e=await res.json().catch(()=>({})); if(isDeadKeyError(res.status,e?.error?.message||''))blacklistKey(key,'chat '+res.status); }
+          }
+          if (reply && reply.length > 5) { resolve({reply,name}); return; }
+        } catch(e) { /* try next key */ }
+      }
+      reject(new Error(name+' chat all keys failed'));
+    });
+  }
+
+  try {
+    const winner = await Promise.any([
+      tryChatProvider(chosen,0),
+      tryChatProvider(others[0],1000),
+      tryChatProvider(others[1],1200),
+    ]);
+    activeProvider = winner.name;
+    return winner.reply;
+  } catch {
+    return 'All AI engines are unavailable. Go to Profile → AI Engine Settings to add fresh API keys.';
+  }
+}
+
+function getVisionKey() {
+  const b2 = getLiveKeys('bett2'); if (b2.length) return { type:'gemini', key:b2[0] };
+  const b1 = getLiveKeys('bett1'); if (b1.length) return { type:'groq',   key:b1[0] };
+  return null;
+}
+// ── State Variables ──
 let CU=null, quizData=[], quizDone=false, uploadedText='', uploadedFileName='';
 let mediaRec=null, recInterval=null, recSecs=0, recognition=null, transcript='';
 let fcCards=[], fcMastery={}, chatHistory=[], currentChatContext='';
 let explainLevel='eli5';
-// Pomodoro
 let pomoTimer=null, pomoSecs=25*60, pomoTotalSecs=25*60, pomoRunning=false;
 let pomoMode='focus', pomoSession=1, pomoSessions=[];
 
@@ -994,22 +1347,6 @@ function mdToHtml(md){
     .replace(/\n\n+/g,'</p><p>').replace(/^(?!<[hulo])/gm,s=>s.trim()?'<p>'+s+'</p>':'').replace(/<p><\/p>/g,'');
 }
 
-// ── GROQ ──
-async function callGroq(sys,usr,temp=0.7){
-  const res=await fetch(GROQ_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-    body:JSON.stringify({model:GROQ_MODEL,max_tokens:4096,temperature:temp,messages:[{role:'system',content:sys},{role:'user',content:usr}]})});
-  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e?.error?.message||'API error '+res.status);}
-  return(await res.json()).choices?.[0]?.message?.content||'';
-}
-async function callGroqChunked(sys,text,size=9000){
-  const chunks=[];for(let i=0;i<text.length;i+=size)chunks.push(text.slice(i,i+size));
-  if(chunks.length===1)return callGroq(sys,text);
-  toast(`Processing ${chunks.length} sections…`,6000);
-  const results=[];
-  for(let i=0;i<chunks.length;i++){toast(`Section ${i+1} of ${chunks.length}…`,3000);results.push(await callGroq(sys+`\n[Section ${i+1}/${chunks.length}]`,chunks[i]));}
-  if(results.length>1){toast('Combining all sections…',3000);return callGroq('Combine these note sections into one comprehensive, well-organized document. Remove duplicates. Use ## headings. Return clean markdown.',results.join('\n\n---\n\n'));}
-  return results[0];
-}
 const styleMap={
   concise:'Write a concise summary (200-300 words) with ## headings. Bold key terms.',
   detailed:'Write detailed, comprehensive notes with ## headings and ### subheadings. Bold key concepts. Include definitions, examples, and context.',
@@ -1146,9 +1483,96 @@ function loadProfilePage(){
   $('stCards').textContent=hist.filter(h=>h.type==='flashcards').length;
   const prefs=JSON.parse(localStorage.getItem('ksi_prefs')||'{}');
   $('autoSaveChk').checked=!!prefs.autoSave;$('soundChk').checked=prefs.sound!==false;
+  renderEnginePills();
 }
 window.saveProfile=async()=>{const name=$('editName').value.trim();if(!name)return toast('Enter a name');await updateProfile(CU,{displayName:name});$('uName').textContent=name.split(' ')[0];$('profName').textContent=name;toast('Profile updated! ✓');};
 window.savePrefs=()=>{const p={autoSave:$('autoSaveChk').checked,sound:$('soundChk').checked};localStorage.setItem('ksi_prefs',JSON.stringify(p));if(p.autoSave)$('saveChk').checked=true;};
+
+// ── AI Engine Settings UI ──
+window.selectEngine=name=>{
+  const cfg=loadEngineConfig();cfg.chosen=name;saveEngineConfig(cfg);
+  renderEnginePills();
+  const labels={bett1:'Bett1 (Groq)',bett2:'Bett2 (Gemini)',bett3:'Bett3 (DeepSeek)'};
+  toast(`✅ ${labels[name]} set as primary engine!`);
+};
+window.markKeyDirty=()=>{$('saveEngineBtn').textContent='💾 Save Changes';};
+
+// Build a key row for the multi-key list
+window.addKeyField=(provider, value='', index=null)=>{
+  const listEl=$(provider+'KeysList'); if(!listEl)return;
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;gap:.4rem;align-items:center;';
+  const dead = value && isBlacklisted(value);
+  row.innerHTML=`
+    <input type="password" class="txt-input key-input-${provider}" style="flex:1;font-size:.8rem;${dead?'border-color:rgba(255,96,144,.5);background:rgba(255,96,144,.05);':''}" placeholder="${provider==='bett1'?'gsk_…':provider==='bett2'?'AIzaSy…':'sk-or-v1-…'}" value="${dead?'':value}" oninput="markKeyDirty()"/>
+    ${dead?'<span title="This key was disabled — paste a new one" style="font-size:.8rem;color:var(--a3);flex-shrink:0;">🔴</span>':'<span style="font-size:.8rem;color:var(--a5);flex-shrink:0;opacity:0;" class="key-ok-${provider}">✅</span>'}
+    <button class="btn btn-g btn-sm" onclick="testKeyRow(this,'${provider}')" style="flex-shrink:0;">Test</button>
+    <button onclick="this.closest('div').remove();markKeyDirty();" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:0 .2rem;flex-shrink:0;">✕</button>`;
+  listEl.appendChild(row);
+};
+
+window.testKeyRow=async(btn, provider)=>{
+  const input=btn.previousElementSibling?.previousElementSibling||btn.parentElement.querySelector('input');
+  const key=input?.value?.trim(); if(!key)return toast('Enter a key first');
+  const orig=btn.textContent; btn.textContent='…'; btn.disabled=true;
+  try{
+    let result='';
+    if(provider==='bett1') result=await callGroqRaw(key,'You are a test.','Reply with exactly: KEY_OK',0);
+    else if(provider==='bett2') result=await callGeminiRaw(key,'You are a test.','Reply with exactly: KEY_OK',0);
+    else if(provider==='bett3') result=await callOpenRouterRaw(key,'You are a test.','Reply with exactly: KEY_OK',0);
+    btn.textContent='✅';btn.style.color='var(--a5)';
+    toast(`✅ ${provider} key is working!`);
+    // Remove from blacklist if it was there
+    delete keyBlacklist[key]; sessionStorage.setItem('ksi_blacklist',JSON.stringify(keyBlacklist));
+  }catch(e){
+    btn.textContent='❌';btn.style.color='var(--a3)';
+    toast(`❌ Key failed: ${e.message.slice(0,80)}`);
+  }
+  setTimeout(()=>{btn.textContent=orig;btn.disabled=false;btn.style.color='';},3000);
+};
+
+// Legacy single-key test (keep for backwards compat)
+window.testKey=async(name)=>{
+  const rows=document.querySelectorAll(`.key-input-${name}`);
+  if(rows.length){await testKeyRow({textContent:'Test',previousElementSibling:{previousElementSibling:rows[0]},parentElement:rows[0].parentElement,disabled:false},name);return;}
+};
+
+window.saveEngineSettings=()=>{
+  const cfg=loadEngineConfig();
+  ['bett1','bett2','bett3'].forEach(p=>{
+    const inputs=[...document.querySelectorAll(`.key-input-${p}`)];
+    const keys=inputs.map(i=>i.value.trim()).filter(k=>k.length>8);
+    if(keys.length>0) cfg[p+'Keys']=keys;
+  });
+  saveEngineConfig(cfg);
+  $('saveEngineBtn').textContent='💾 Save';
+  $('engineSaveMsg').style.display='block';setTimeout(()=>$('engineSaveMsg').style.display='none',2500);
+  renderEnginePills();toast('🔑 Engine settings saved!');
+};
+
+function renderEnginePills(){
+  const cfg=loadEngineConfig();
+  ['bett1','bett2','bett3'].forEach(name=>{
+    const pill=$('pill-'+name); const tag=$('tag-'+name);
+    if(!pill)return;
+    pill.classList.toggle('active',cfg.chosen===name);
+    const keys=cfg[name+'Keys']||[];
+    const liveCount=keys.filter(k=>!isBlacklisted(k)).length;
+    const deadCount=keys.length-liveCount;
+    if(cfg.chosen===name){tag.textContent=`★ Primary · ${liveCount} live`;tag.className='ep-tag active';}
+    else if(liveCount>0){tag.textContent=`Backup · ${liveCount} live`;tag.className='ep-tag ok';}
+    else if(deadCount>0){tag.textContent=`⚠️ ${deadCount} disabled`;tag.className='ep-tag err';}
+    else{tag.textContent='No keys';tag.className='ep-tag none';}
+  });
+  // Rebuild key list UIs
+  ['bett1','bett2','bett3'].forEach(p=>{
+    const listEl=$(p+'KeysList'); if(!listEl)return;
+    listEl.innerHTML='';
+    const keys=cfg[p+'Keys']||[];
+    if(keys.length===0){addKeyField(p,'');}
+    else{keys.forEach(k=>addKeyField(p,k));}
+  });
+}
 window.exportAllNotes=()=>{
   const notes=getSaved();if(!notes.length)return toast('No saved notes to export');
   const text=notes.map(n=>`=== ${n.title} ===\n${n.content.replace(/<[^>]+>/g,'')}\n`).join('\n\n');
@@ -1239,12 +1663,26 @@ async function readImage(file){
 }
 function fileToBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});}
 async function describeImageWithGroq(b64,context=''){
-  // Use Groq's vision model if available, fallback to text model
-  try{
-    const res=await fetch(GROQ_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-      body:JSON.stringify({model:'meta-llama/llama-4-scout-17b-16e-instruct',max_tokens:800,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:image/jpeg;base64,${b64}`}},{type:'text',text:`Describe all text, data, charts, diagrams, and visual information in this image (context: ${context}). Extract everything useful for studying.`}]}]})});
-    if(res.ok)return((await res.json()).choices?.[0]?.message?.content||'');
-  }catch{}
+  const vk = getVisionKey();
+  // Try Gemini Vision first — best free vision model
+  if (vk && vk.type === 'gemini') {
+    try{
+      const body={contents:[{role:'user',parts:[{inline_data:{mime_type:'image/jpeg',data:b64}},{text:`Describe all text, data, charts, diagrams, formulas, and visual information in this image (context: ${context}). Extract everything useful for studying. Be thorough.`}]}],generationConfig:{temperature:0.3,maxOutputTokens:1000}};
+      const res=await fetch(GEMINI_URL+vk.key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
+      if(res.ok){const d=await res.json();const desc=d?.candidates?.[0]?.content?.parts?.[0]?.text||'';if(desc.length>20)return desc;}
+    }catch(e){console.warn('Gemini vision failed:',e.message);}
+  }
+  // Fallback: Groq vision (llama-4-scout)
+  const cfg = loadEngineConfig();
+  const groqKey = cfg.bett1Key;
+  if (groqKey) {
+    try{
+      const res=await fetch(GROQ_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+        body:JSON.stringify({model:'meta-llama/llama-4-scout-17b-16e-instruct',max_tokens:800,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:image/jpeg;base64,${b64}`}},{type:'text',text:`Describe all text, data, charts, diagrams, and visual information in this image (context: ${context}). Extract everything useful for studying.`}]}]}),
+        signal:AbortSignal.timeout(15000)});
+      if(res.ok){const d=await res.json();const desc=d.choices?.[0]?.message?.content||'';if(desc.length>20)return desc;}
+    }catch(e){console.warn('Groq vision failed:',e.message);}
+  }
   return '';
 }
 window.genPdf=async()=>{
@@ -1267,44 +1705,184 @@ window.notesToFlashcards=()=>{const t=$('notesContent').innerText;if(!t)return;$
 window.notesToQuiz=()=>{const t=$('notesContent').innerText;if(!t)return;$('quizIn').value=t.slice(0,8000);nav('quiz',qs('[data-page=quiz]'));toast('Notes loaded → generate quiz!');};
 
 // ── YOUTUBE ──
-function getYtId(url){for(const p of[/youtu\.be\/([^?&\s]+)/,/[?&]v=([^?&\s]+)/,/\/shorts\/([^?&\s]+)/,/\/embed\/([^?&\s]+)/]){const m=url.match(p);if(m)return m[1];}return null;}
-window.previewYt=()=>{const id=getYtId($('ytUrl').value.trim());if(!id)return toast('Invalid YouTube URL');$('ytThumb').src=`https://img.youtube.com/vi/${id}/mqdefault.jpg`;$('ytTitle').textContent='Loading preview…';$('ytPreview').style.display='block';setTimeout(()=>$('ytTitle').textContent='Video ID: '+id,200);};
-window.genYt=async()=>{
-  const url=$('ytUrl').value.trim();if(!url)return toast('Please paste a YouTube URL');
-  const id=getYtId(url);if(!id)return toast('Could not find a valid YouTube video ID');
-  setLoad('ytBtn','ytSpin',true);$('ytThumb').src=`https://img.youtube.com/vi/${id}/mqdefault.jpg`;$('ytTitle').textContent='Fetching transcript…';$('ytPreview').style.display='block';
-  let transcriptText='';
-  const endpoints=[
-    `https://yt-transcript-api.vercel.app/api/transcript?videoId=${id}`,
-    `https://api.kome.ai/api/tools/youtube-transcripts?videoId=${id}`,
-    `https://ytdl-transcript.vercel.app/api/transcript?id=${id}`,
-  ];
-  for(const ep of endpoints){
-    try{const r=await fetch(ep,{signal:AbortSignal.timeout(8000)});if(r.ok){const d=await r.json();if(Array.isArray(d))transcriptText=d.map(s=>s.text||s.content||'').join(' ');else if(d.transcript)transcriptText=d.transcript;else if(d.content)transcriptText=d.content;if(transcriptText.length>200)break;}}catch{}
+function getYtId(url){
+  for(const p of[/youtu\.be\/([^?&\s]+)/,/[?&]v=([^?&\s]+)/,/\/shorts\/([^?&\s]+)/,/\/embed\/([^?&\s]+)/,/\/live\/([^?&\s]+)/]){
+    const m=url.match(p); if(m&&m[1])return m[1].split('?')[0].split('&')[0];
   }
-  const styleKey=$('ytStyle').value;
-  let result;
+  return null;
+}
+
+window.previewYt=async()=>{
+  const id=getYtId($('ytUrl').value.trim());
+  if(!id)return toast('Invalid YouTube URL');
+  $('ytThumb').src=`https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+  $('ytPreview').style.display='block';
   try{
-    if(transcriptText.length>200){
-      $('ytTitle').textContent=`✓ Transcript found (${Math.round(transcriptText.length/1000)}k chars) — generating notes…`;
-      const sys=`Expert study assistant. This is a YouTube video transcript (URL: ${url}). Convert to well-structured study notes. Remove filler words, ums, ahs. ${styleMap[styleKey]||styleMap.detailed} Use markdown.`;
-      result=await callGroqChunked(sys,transcriptText);
-    }else{
-      $('ytTitle').textContent='Generating notes from video context…';
-      result=await callGroq(`Expert study assistant. Generate comprehensive, detailed study notes for the following YouTube video. Be thorough — cover all likely topics covered based on the title/URL. ${styleMap[styleKey]||styleMap.detailed} Use markdown. Add a note at the top that transcript was unavailable.`,`YouTube URL: ${url}\nVideo ID: ${id}\n\nTranscript unavailable. Generate the most comprehensive notes possible based on the video URL and context. If you recognize this video from your training data, include its actual content.`);
+    const r=await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`,{signal:AbortSignal.timeout(5000)});
+    if(r.ok){const d=await r.json();$('ytTitle').textContent=`${d.title||'Video'} — ${d.author_name||''}`;return;}
+  }catch{}
+  $('ytTitle').textContent='Video ID: '+id;
+};
+
+// ── Core transcript fetcher — fires ALL endpoints in parallel, takes first winner ──
+async function fetchYtTranscript(id, url) {
+  // Parse helper — handles all common transcript API response shapes
+  function parseTranscript(d) {
+    if (typeof d === 'string' && d.length > 100) return d;
+    if (Array.isArray(d)) return d.map(s => s.text || s.content || s.transcript || '').filter(Boolean).join(' ');
+    if (d && typeof d === 'object') {
+      if (d.transcript && d.transcript.length > 100) return d.transcript;
+      if (d.content  && d.content.length  > 100) return d.content;
+      if (d.text     && d.text.length     > 100) return d.text;
+      if (Array.isArray(d.captions))  return d.captions.map(c=>c.text||'').join(' ');
+      if (Array.isArray(d.segments))  return d.segments.map(s=>s.text||'').join(' ');
+      if (Array.isArray(d.subtitles)) return d.subtitles.map(s=>s.text||'').join(' ');
+      if (Array.isArray(d.events))    return d.events.map(e=>e.segs?e.segs.map(s=>s.utf8||'').join(''):'' ).join(' ');
     }
-    const html=mdToHtml(result);$('ytContent').innerHTML=html;$('ytOut').classList.add('show');
-    $('ytTitle').textContent=transcriptText.length>200?`✅ Notes from transcript (${Math.round(transcriptText.length/1000)}k words)`:'⚠️ Transcript unavailable — notes from context';
-    addHistory('youtube','YouTube: '+id);
-    const prefs=JSON.parse(localStorage.getItem('ksi_prefs')||'{}');if(prefs.autoSave)await saveNote('▶️ YouTube: '+id,html);
-  }catch(e){toast('Error: '+e.message);}
+    return '';
+  }
+
+  // All 10 transcript endpoints fire simultaneously
+  const endpoints = [
+    `https://yt-transcript-api.vercel.app/api/transcript?videoId=${id}`,
+    `https://api.kome.ai/api/tools/youtube-transcripts?videoId=${id}&format=text`,
+    `https://ytdl-transcript.vercel.app/api/transcript?id=${id}`,
+    `https://tactiq-apps-prod.tactiq.io/transcript?videoUrl=https://www.youtube.com/watch?v=${id}`,
+    `https://yt-transcript.deno.dev/?v=${id}`,
+    `https://transcript.yt/api/transcript?video_id=${id}`,
+    `https://yttranscript.onrender.com/transcript/${id}`,
+    `https://api.superpowered.ai/youtube/transcripts?video_id=${id}`,
+    `https://youtube-transcript3.p.rapidapi.com/api/transcript?videoId=${id}`,
+    `https://get-youtube-transcript-pi.vercel.app/api/transcript?videoId=${id}`,
+  ];
+
+  // Wrap each endpoint as a promise — resolves only if we get real transcript text
+  const attempts = endpoints.map(ep =>
+    new Promise(async (resolve, reject) => {
+      try {
+        const r = await fetch(ep, { signal: AbortSignal.timeout(8000), headers: { 'Accept': 'application/json' } });
+        if (!r.ok) return reject(new Error('HTTP '+r.status));
+        const ct = r.headers.get('content-type') || '';
+        let d;
+        if (ct.includes('json')) d = await r.json();
+        else { const t = await r.text(); try { d = JSON.parse(t); } catch { d = t; } }
+        const text = parseTranscript(d);
+        if (text && text.trim().length > 200) resolve({ text: text.trim(), source: ep });
+        else reject(new Error('Too short'));
+      } catch(e) { reject(e); }
+    })
+  );
+
+  // Race — return the first one that wins
+  try {
+    return await Promise.any(attempts);
+  } catch {
+    return null; // All failed
+  }
+}
+
+// ── Fetch video metadata (title, channel, description) from oEmbed ──
+async function fetchYtMeta(id) {
+  try {
+    const r = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`, { signal: AbortSignal.timeout(5000) });
+    if (r.ok) { const d = await r.json(); return { title: d.title||'', channel: d.author_name||'' }; }
+  } catch {}
+  return { title: '', channel: '' };
+}
+
+window.genYt=async()=>{
+  const url=$('ytUrl').value.trim(); if(!url)return toast('Please paste a YouTube URL');
+  const id=getYtId(url); if(!id)return toast('Could not find a valid YouTube video ID');
+  setLoad('ytBtn','ytSpin',true);
+  $('ytThumb').src=`https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+  $('ytTitle').textContent='⚡ Firing all transcript sources simultaneously…';
+  $('ytPreview').style.display='block';
+
+  // Fire transcript fetch + metadata fetch at the same time
+  const [transcriptResult, meta] = await Promise.all([
+    fetchYtTranscript(id, url),
+    fetchYtMeta(id)
+  ]);
+
+  // Update preview with real title if we got it
+  if(meta.title) {
+    $('ytTitle').textContent = `${meta.title}${meta.channel?' — '+meta.channel:''}`;
+    $('ytThumb').src = `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+  }
+
+  const styleKey = $('ytStyle').value;
+  const styleInstruction = styleMap[styleKey] || styleMap.detailed;
+  const videoContext = `Video URL: ${url}\nVideo ID: ${id}${meta.title?'\nTitle: '+meta.title:''}${meta.channel?'\nChannel: '+meta.channel:''}`;
+
+  try {
+    let result;
+
+    if (transcriptResult && transcriptResult.text.length > 200) {
+      // ✅ We have a real transcript — generate the best possible notes
+      const wordCount = transcriptResult.text.split(' ').length;
+      $('ytTitle').textContent=`✅ Transcript found (${wordCount.toLocaleString()} words) — generating notes with ${activeProvider==='bett1'?'Bett1':'activeProvider'==='bett2'?'Bett2':'Bett3'}…`;
+
+      const sys = `You are an expert academic study assistant. You have been given the FULL transcript of a YouTube video.
+Your job is to convert it into excellent, comprehensive study notes.
+
+${videoContext}
+Word count: ~${wordCount} words
+
+INSTRUCTIONS:
+- Remove all filler words, stutters, repetitions, sponsor mentions, and "like/subscribe" calls
+- Preserve ALL educational content, facts, explanations, examples, and arguments
+- Organize logically with clear headings even if the speaker jumped around
+- ${styleInstruction}
+- Use markdown formatting throughout
+- If the video has distinct sections or chapters, reflect them in your headings
+- End with a ## Key Takeaways section (5-8 bullet points of the most important things to remember)`;
+
+      result = await callGroqChunked(sys, transcriptResult.text);
+
+    } else {
+      // ⚠️ No transcript — be honest but still maximally helpful
+      $('ytTitle').textContent='⚠️ No transcript available — generating from AI knowledge…';
+
+      result = await callAI(
+        `You are an expert study assistant. A student wants study notes from a YouTube video but the automatic transcript could not be fetched.
+
+${videoContext}
+
+INSTRUCTIONS:
+- If you recognize this specific video from your training data, generate accurate notes based on its actual content
+- If you do NOT recognize it, be completely honest — say the transcript was unavailable
+- Then ask the student to paste the video transcript or description in the box below
+- Offer a helpful prompt they can use: suggest they copy the auto-generated captions from YouTube (click ··· under the video → "Show transcript")
+- ${styleInstruction}
+- Use markdown formatting`,
+        `Please generate study notes for: ${url}\n${meta.title?'Title: '+meta.title:''}\n${meta.channel?'Channel: '+meta.channel:''}`
+      );
+    }
+
+    const html = mdToHtml(result);
+    $('ytContent').innerHTML = html;
+    $('ytOut').classList.add('show');
+
+    const statusLabel = transcriptResult
+      ? `✅ ${transcriptResult.text.split(' ').length.toLocaleString()} word transcript · powered by ${loadEngineConfig().chosen}`
+      : `⚠️ Transcript not found · AI knowledge used · ${loadEngineConfig().chosen}`;
+    $('ytTitle').textContent = meta.title ? `${meta.title} · ${statusLabel}` : statusLabel;
+
+    addHistory('youtube', meta.title||('YouTube: '+id));
+    const prefs=JSON.parse(localStorage.getItem('ksi_prefs')||'{}');
+    if(prefs.autoSave) await saveNote('▶️ '+(meta.title||id), html);
+
+  } catch(e) { toast('Error generating notes: '+e.message); }
   setLoad('ytBtn','ytSpin',false);
 };
+
 window.ytToFlashcards=async()=>{
-  const url=$('ytUrl').value.trim();if(!url)return toast('Paste a URL first');
-  const id=getYtId(url);if(!id)return toast('Invalid YouTube URL');
-  $('fcIn').value=`Generate flashcards from this YouTube video: ${url}`;
-  nav('flashcards',qs('[data-page=flashcards]'));toast('Loaded → generate flashcards!');
+  const t=$('ytContent')?.innerText;
+  if(t&&t.length>50){ $('fcIn').value=t.slice(0,8000); nav('flashcards',qs('[data-page=flashcards]')); toast('YouTube notes loaded → generate flashcards!'); return; }
+  const url=$('ytUrl').value.trim(); if(!url)return toast('Generate notes first, then make flashcards');
+  const id=getYtId(url); if(!id)return toast('Invalid YouTube URL');
+  $('fcIn').value=`Create flashcards about the YouTube video: ${url}`;
+  nav('flashcards',qs('[data-page=flashcards]')); toast('Loaded → generate flashcards!');
 };
 
 // ── LECTURE ──
@@ -1351,12 +1929,10 @@ window.sendChat=async()=>{
     chatHistory.push({role:'user',content:input});
     const sys=`You are KSI-AI, an expert AI study tutor. You help students understand concepts, practice problems, and prepare for exams. Be encouraging, clear, and thorough. Use examples. Format responses with markdown when helpful (bold key terms, bullet points for lists).${ctx?'\n\nStudent context/notes:\n'+ctx.slice(0,3000):''}`;
     const msgs=[...chatHistory.slice(-12)];
-    const res=await fetch(GROQ_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},body:JSON.stringify({model:GROQ_MODEL,max_tokens:1500,temperature:0.8,messages:[{role:'system',content:sys},...msgs]})});
-    if(!res.ok)throw new Error('API error');
-    const data=await res.json();const reply=data.choices?.[0]?.message?.content||'I had trouble responding. Try again!';
+    const reply = await callAIChat(sys, msgs, 0.8);
     chatHistory.push({role:'assistant',content:reply});
     removeTyping();appendChat('ai',reply);
-  }catch(e){removeTyping();appendChat('ai','Sorry, I ran into an error. Please try again.');}
+  }catch(e){removeTyping();appendChat('ai','Sorry, all AI providers are busy right now. Please try again in a moment.');}
 };
 function appendChat(role,text){
   const msgs=$('chatMsgs');
